@@ -43,9 +43,3 @@ void ASpectator_InGame::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-
-void ASpectator_InGame::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}

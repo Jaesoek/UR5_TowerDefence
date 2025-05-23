@@ -26,11 +26,15 @@ protected:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	UInputMappingContext* DefaultMappingContext;
+	UInputMappingContext* m_pDefaultMappingContext;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	UInputAction* MouseMoving;
+	UInputAction* m_pMouseMoving;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	UInputAction* MouseClick;
+	UInputAction* m_pMouseClick;
+
+
+private:
+	APawn* m_pPossesedPawn = nullptr;
 };
