@@ -1,9 +1,13 @@
 #include "Spectator_InGame.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 ASpectator_InGame::ASpectator_InGame()
 {
+	SetCanBeDamaged(false);
+
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Don't rotate character to camera direction
@@ -23,13 +27,18 @@ ASpectator_InGame::ASpectator_InGame()
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+
+	// Collision
+	GetMovementComponent()->bComponentShouldUpdatePhysicsVolume = false;
+
+	static FName CollisionProfileName(TEXT("Spectator"));
+	GetCapsuleComponent()->SetCollisionProfileName(CollisionProfileName);
 }
 
 void ASpectator_InGame::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
 }
 
 void ASpectator_InGame::PossessedBy(AController* NewController)

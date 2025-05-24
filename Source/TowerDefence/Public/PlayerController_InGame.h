@@ -19,17 +19,16 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void SetupInputComponent() override;
+	virtual void PlayerTick(float fDeltaTime) override;
 
 protected:
-	void HandleMouseMoving(const FInputActionValue& Value);
 	void HandleMouseClick(const FInputActionValue& Value);
+	void MoveCamera(FVector2D vMove, float fDeltaTime);
+
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputMappingContext* m_pDefaultMappingContext;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	UInputAction* m_pMouseMoving;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* m_pMouseClick;
