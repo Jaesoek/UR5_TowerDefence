@@ -1,12 +1,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Pawn.h"
+#include "GameFramework/Character.h"
 #include "IControlUnit.h"
 #include "Player_InGame.generated.h"
 
 UCLASS()
-class TOWERDEFENCE_API APlayer_InGame : public APawn, public IControlUnit
+class TOWERDEFENCE_API APlayer_InGame : public ACharacter, public IControlUnit
 {
 	GENERATED_BODY()
 

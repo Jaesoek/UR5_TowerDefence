@@ -21,6 +21,5 @@ void APlayer_InGame::Tick(float DeltaTime)
 
 void APlayer_InGame::OnFocused()
 {
-	// 여기서 처리
 	UE_LOG(LogTemp, Display, TEXT("TTT"));
 }

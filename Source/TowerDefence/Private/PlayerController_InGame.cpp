@@ -1,7 +1,7 @@
 #include "PlayerController_InGame.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
-
+#include "../Public/IControlUnit.h"
 
 APlayerController_InGame::APlayerController_InGame()
 {
@@ -77,7 +77,17 @@ void APlayerController_InGame::PlayerTick(float fDeltaTime)
 
 void APlayerController_InGame::HandleMouseClick(const FInputActionValue& Value)
 {
-	UE_LOG(LogTemp, Display, TEXT("TEST mouse click!!"));
+	// TODO: 범위 
+	FHitResult HitResult;
+	GetHitResultUnderCursor(ECC_Camera, false, HitResult);
+	if (HitResult.bBlockingHit)
+	{
+		IControlUnit* pControlUnit = dynamic_cast<IControlUnit*>(HitResult.GetActor());
+		if (pControlUnit)
+		{
+			pControlUnit->OnFocused();
+		}
+	}
 }
 
 void APlayerController_InGame::MoveCamera(FVector2D vMove, float fDeltaTime)
