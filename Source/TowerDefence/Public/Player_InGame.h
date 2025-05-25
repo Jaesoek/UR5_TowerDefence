@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "IControlUnit.h"
+#include "ControlUnit.h"
 #include "Player_InGame.generated.h"
 
 UCLASS()
