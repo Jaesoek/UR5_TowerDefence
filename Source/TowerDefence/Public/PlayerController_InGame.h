@@ -17,7 +17,6 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void OnPossess(APawn* InPawn) override;
 	virtual void SetupInputComponent() override;
 	virtual void PlayerTick(float fDeltaTime) override;
 
@@ -35,5 +34,5 @@ protected:
 
 
 private:
-	APawn* m_pPossesedPawn = nullptr;
+	TScriptInterface<class IControlUnit> m_pControlUnit;
 };

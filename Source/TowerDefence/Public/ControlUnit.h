@@ -17,4 +17,5 @@ class IControlUnit
 
 public:
 	virtual void OnFocused() = 0;
+	virtual void OnMoveTo(const FVector& vTargetPos) = 0;
 };

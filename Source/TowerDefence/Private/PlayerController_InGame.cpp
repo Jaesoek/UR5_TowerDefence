@@ -25,13 +25,6 @@ void APlayerController_InGame::BeginPlay()
 	bShowMouseCursor = true;
 }
 
-void APlayerController_InGame::OnPossess(APawn* InPawn)
-{
-	Super::OnPossess(InPawn);
-
-	m_pPossesedPawn = InPawn;
-}
-
 void APlayerController_InGame::SetupInputComponent()
 {
 	Super::SetupInputComponent();
@@ -79,23 +72,25 @@ void APlayerController_InGame::HandleMouseClick(const FInputActionValue& Value)
 {
 	FHitResult HitResult;
 	GetHitResultUnderCursor(ECC_Camera, false, HitResult);
-	if (HitResult.bBlockingHit)
+
+	if (IsValid(m_pControlUnit.GetObject()))
 	{
-		IControlUnit* pControlUnit = Cast<IControlUnit>(HitResult.GetActor());
-		if (pControlUnit)
+		m_pControlUnit->OnMoveTo(HitResult.Location);
+	}
+	else
+	{
+		if (HitResult.bBlockingHit)
 		{
-			pControlUnit->OnFocused();
+			m_pControlUnit = HitResult.GetActor();
+			if (m_pControlUnit && m_pControlUnit.GetInterface() != nullptr)
+				m_pControlUnit->OnFocused();
+			else
+				m_pControlUnit = nullptr;
 		}
 	}
 }
 
 void APlayerController_InGame::MoveCamera(FVector2D vMove, float fDeltaTime)
 {
-	if (!IsValid(m_pPossesedPawn))
-	{
-		m_pPossesedPawn = nullptr;
-		return;
-	}
-
-	m_pPossesedPawn->AddMovementInput({ vMove.Y * fDeltaTime, vMove.X * fDeltaTime, 0.f });
+	GetPawn()->AddMovementInput({ vMove.Y, vMove.X, 0.f }, fDeltaTime);
 }

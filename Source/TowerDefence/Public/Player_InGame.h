@@ -21,4 +21,5 @@ public:
 
 public:
 	virtual void OnFocused() override;
+	virtual void OnMoveTo(const FVector& vTargetPos) override;
 };
