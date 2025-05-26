@@ -1,4 +1,4 @@
-#include "Player_InGame.h"
+#include "Player_TowerDefence.h"
 #include "../Public/AIControl_Player.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
@@ -6,7 +6,7 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 
 
-APlayer_InGame::APlayer_InGame()
+APlayer_TowerDefence::APlayer_TowerDefence()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -14,24 +14,24 @@ APlayer_InGame::APlayer_InGame()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
-void APlayer_InGame::BeginPlay()
+void APlayer_TowerDefence::BeginPlay()
 {
 	Super::BeginPlay();
 
 }
 
-void APlayer_InGame::Tick(float DeltaTime)
+void APlayer_TowerDefence::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
-void APlayer_InGame::OnFocused()
+void APlayer_TowerDefence::OnFocused()
 {
 	// TODO: Render selected ring
 }
 
-void APlayer_InGame::OnMoveTo(const FVector& vTargetPos)
+void APlayer_TowerDefence::OnMoveTo(const FVector& vTargetPos)
 {
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), vTargetPos);
 }

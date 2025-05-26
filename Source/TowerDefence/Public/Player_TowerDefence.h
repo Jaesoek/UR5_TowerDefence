@@ -3,15 +3,15 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "ControlUnit.h"
-#include "Player_InGame.generated.h"
+#include "Player_TowerDefence.generated.h"
 
 UCLASS()
-class TOWERDEFENCE_API APlayer_InGame : public ACharacter, public IControlUnit
+class TOWERDEFENCE_API APlayer_TowerDefence : public ACharacter, public IControlUnit
 {
 	GENERATED_BODY()
 
 public:
-	APlayer_InGame();
+	APlayer_TowerDefence();
 
 protected:
 	virtual void BeginPlay() override;

@@ -1,9 +1,9 @@
-#include "PlayerController_InGame.h"
+#include "PlayerController_TowerDefence.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "../Public/ControlUnit.h"
 
-APlayerController_InGame::APlayerController_InGame()
+APlayerController_TowerDefence::APlayerController_TowerDefence()
 {
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMCFinder_Spectator(TEXT("/Game/TowerDefence/Characters/IMC_Spectator"));
 	if (IMCFinder_Spectator.Succeeded())
@@ -14,7 +14,7 @@ APlayerController_InGame::APlayerController_InGame()
 		m_pMouseClick = IAFinder_MouseClick.Object;
 }
 
-void APlayerController_InGame::BeginPlay()
+void APlayerController_TowerDefence::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -25,7 +25,7 @@ void APlayerController_InGame::BeginPlay()
 	bShowMouseCursor = true;
 }
 
-void APlayerController_InGame::SetupInputComponent()
+void APlayerController_TowerDefence::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
@@ -36,11 +36,11 @@ void APlayerController_InGame::SetupInputComponent()
 	// IA
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
 	{
-		EnhancedInputComponent->BindAction(m_pMouseClick, ETriggerEvent::Completed, this, &APlayerController_InGame::HandleMouseClick);
+		EnhancedInputComponent->BindAction(m_pMouseClick, ETriggerEvent::Completed, this, &APlayerController_TowerDefence::HandleMouseClick);
 	}
 }
 
-void APlayerController_InGame::PlayerTick(float fDeltaTime)
+void APlayerController_TowerDefence::PlayerTick(float fDeltaTime)
 {
 	Super::PlayerTick(fDeltaTime);
 
@@ -68,7 +68,7 @@ void APlayerController_InGame::PlayerTick(float fDeltaTime)
 		MoveCamera(CameraDirection, fDeltaTime);
 }
 
-void APlayerController_InGame::HandleMouseClick(const FInputActionValue& Value)
+void APlayerController_TowerDefence::HandleMouseClick(const FInputActionValue& Value)
 {
 	FHitResult HitResult;
 	GetHitResultUnderCursor(ECC_Camera, false, HitResult);
@@ -90,7 +90,7 @@ void APlayerController_InGame::HandleMouseClick(const FInputActionValue& Value)
 	}
 }
 
-void APlayerController_InGame::MoveCamera(FVector2D vMove, float fDeltaTime)
+void APlayerController_TowerDefence::MoveCamera(FVector2D vMove, float fDeltaTime)
 {
-	GetPawn()->AddMovementInput({ vMove.Y, vMove.X, 0.f }, fDeltaTime);
+	GetPawn()->AddMovementInput({ vMove.Y, vMove.X, 0.f }, fDeltaTime * m_fCamspeed);
 }

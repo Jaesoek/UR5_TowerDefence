@@ -2,15 +2,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Spectator_InGame.generated.h"
+#include "CameraCharacter_TowerDefence.generated.h"
 
 UCLASS()
-class TOWERDEFENCE_API ASpectator_InGame : public ACharacter
+class TOWERDEFENCE_API ACameraCharacter_TowerDefence : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	ASpectator_InGame();
+	ACameraCharacter_TowerDefence();
 
 protected:
 	virtual void BeginPlay() override;

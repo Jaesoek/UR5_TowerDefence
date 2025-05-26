@@ -5,15 +5,15 @@
 #include "InputActionValue.h"
 #include "InputMappingContext.h"
 #include "InputAction.h"
-#include "PlayerController_InGame.generated.h"
+#include "PlayerController_TowerDefence.generated.h"
 
 UCLASS()
-class TOWERDEFENCE_API APlayerController_InGame : public APlayerController
+class TOWERDEFENCE_API APlayerController_TowerDefence : public APlayerController
 {
 	GENERATED_BODY()
 	
 public:
-	APlayerController_InGame();
+	APlayerController_TowerDefence();
 
 protected:
 	virtual void BeginPlay() override;
@@ -32,6 +32,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* m_pMouseClick;
 
+protected:
+	float m_fCamspeed = 20.f;
 
 private:
 	TScriptInterface<class IControlUnit> m_pControlUnit;

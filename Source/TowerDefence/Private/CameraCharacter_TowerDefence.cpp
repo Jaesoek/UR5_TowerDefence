@@ -1,10 +1,10 @@
-#include "Spectator_InGame.h"
+#include "CameraCharacter_TowerDefence.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
-ASpectator_InGame::ASpectator_InGame()
+ACameraCharacter_TowerDefence::ACameraCharacter_TowerDefence()
 {
 	SetCanBeDamaged(false);
 
@@ -35,19 +35,19 @@ ASpectator_InGame::ASpectator_InGame()
 	GetCapsuleComponent()->SetCollisionProfileName(CollisionProfileName);
 }
 
-void ASpectator_InGame::BeginPlay()
+void ACameraCharacter_TowerDefence::BeginPlay()
 {
 	Super::BeginPlay();
 
 }
 
-void ASpectator_InGame::PossessedBy(AController* NewController)
+void ACameraCharacter_TowerDefence::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
 }
 
-void ASpectator_InGame::Tick(float DeltaTime)
+void ACameraCharacter_TowerDefence::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
