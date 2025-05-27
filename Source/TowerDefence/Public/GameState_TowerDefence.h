@@ -42,7 +42,6 @@ protected:
 	FTimerHandle m_TimerHandle_StartRound;
 
 	TArray<AActor*> m_arrSpawners;
-	int32 m_numFinishedSpawn;
 
 
 protected:

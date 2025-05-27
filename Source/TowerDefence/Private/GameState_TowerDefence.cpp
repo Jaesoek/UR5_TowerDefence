@@ -15,12 +15,14 @@ void AGameState_TowerDefence::HandleMatchHasStarted()
 	for (TActorIterator<ASpawnerMonster_TowerDefence> It(GetWorld()); It; ++It)
 		m_arrSpawners.Add(*It);
 
-	if (!m_arrSpawners.IsEmpty())
-		WaitRound();
+	WaitRound();
 }
 
 void AGameState_TowerDefence::WaitRound()
 {
+	if (m_arrSpawners.IsEmpty())
+		return;
+
 	m_curGameState = ERoundState::RoundWaiting;
 
 	GetWorld()->GetTimerManager().SetTimer(
@@ -42,7 +44,6 @@ void AGameState_TowerDefence::StartRound()
 	{
 		if (ASpawnerMonster_TowerDefence* pSpawner = Cast<ASpawnerMonster_TowerDefence>(pSpawnerRef))
 		{
-			m_numFinishedSpawn = 0;
 			pSpawner->StartSpawning(m_iCurLevel);
 			pSpawner->OnWaveFinished.AddUObject(this, &AGameState_TowerDefence::WaveFinished);
 		}
