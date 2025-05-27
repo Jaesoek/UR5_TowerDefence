@@ -12,7 +12,8 @@ enum class ERoundState : uint8
 	WaitingToStart,
 	RoundWaiting,
 	RoundInProgress,
-	RoundEnded
+	RoundEnded,
+	RoundMax
 };
 
 UCLASS()
@@ -23,30 +24,36 @@ class TOWERDEFENCE_API AGameState_TowerDefence : public AGameState
 public:
 	AGameState_TowerDefence();
 
-protected:
-	void HandleMatchHasStarted() override;
-
-public:
-	void WaitRound();	// Test 용으로 열어놓음
-protected:
-	void StartRound();
-	void EndGame();
-
-public:
-	void WaveFinished(bool isSurvive);
+	virtual void WaitRound();
 
 protected:
+	// GameState Interface
+	virtual void HandleMatchHasStarted() override;
+	// ~GameState Interface
+
+	virtual void StartRound();
+	virtual void EndGame();
+	virtual void WaveFinished(bool isSurvive);
+	virtual void SetGameState(ERoundState InRoundState);
+
 	UPROPERTY(BlueprintReadOnly)
 	ERoundState m_curGameState;
 	
-	FTimerHandle m_TimerHandle_StartRound;
-
+	UPROPERTY(Transient)
 	TArray<AActor*> m_arrSpawners;
 
+	UPROPERTY(EditDefaultsOnly)
+	float m_fRoundWaitTime;
 
-protected:
-	UPROPERTY(EditDefaultsOnly, meta = ())
-	float m_fRoundWaitTime = 2.f;
+	UPROPERTY(Transient)
+	int32 m_iCurLevel;
 
-	int32 m_iCurLevel = 0;
+	DECLARE_MULTICAST_DELEGATE(FOnStateChanged)
+	FOnStateChanged OnStateChangedEvent[4];
+
+	DECLARE_MULTICAST_DELEGATE(FOnStartRound)
+	FOnStartRound OnStartRoundEvent;
+
+public:
+	FOnStartRound GetStartRoundEvent() { return OnStartRoundEvent;	}
 };
