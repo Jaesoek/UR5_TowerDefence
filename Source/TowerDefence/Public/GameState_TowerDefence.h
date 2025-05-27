@@ -37,7 +37,7 @@ public:
 
 protected:
 	UPROPERTY(BlueprintReadOnly)
-	ERoundState CurrentRoundState;
+	ERoundState m_curGameState;
 	
 	FTimerHandle m_TimerHandle_StartRound;
 
@@ -49,5 +49,5 @@ protected:
 	UPROPERTY(EditDefaultsOnly, meta = ())
 	float m_fRoundWaitTime = 2.f;
 
-	int m_iCurLevel = 0;
+	int32 m_iCurLevel = 0;
 };

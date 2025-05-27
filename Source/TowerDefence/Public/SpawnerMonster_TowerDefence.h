@@ -25,7 +25,7 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	void StartSpawning(int iLevel);
+	void StartSpawning(int32 iLevel);
 
 	ESpawnerState m_eCurState = ESpawnerState::Default;
 

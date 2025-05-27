@@ -5,7 +5,7 @@
 
 AGameState_TowerDefence::AGameState_TowerDefence()
 {
-	CurrentRoundState = ERoundState::WaitingToStart;
+	m_curGameState = ERoundState::WaitingToStart;
 }
 
 void AGameState_TowerDefence::HandleMatchHasStarted()
@@ -21,7 +21,7 @@ void AGameState_TowerDefence::HandleMatchHasStarted()
 
 void AGameState_TowerDefence::WaitRound()
 {
-	CurrentRoundState = ERoundState::RoundWaiting;
+	m_curGameState = ERoundState::RoundWaiting;
 
 	GetWorld()->GetTimerManager().SetTimer(
 		m_TimerHandle_StartRound,
@@ -36,7 +36,7 @@ void AGameState_TowerDefence::StartRound()
 {
 	m_iCurLevel += 1;
 
-	CurrentRoundState = ERoundState::RoundInProgress;
+	m_curGameState = ERoundState::RoundInProgress;
 
 	for (auto& pSpawnerRef : m_arrSpawners)
 	{
@@ -51,6 +51,8 @@ void AGameState_TowerDefence::StartRound()
 
 void AGameState_TowerDefence::EndGame()
 {
+	m_curGameState = ERoundState::WaitingToStart;
+
 	// 모든 객체가 뒤졌거나 게임 종료시 처리
 
 }

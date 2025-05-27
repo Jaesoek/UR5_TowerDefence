@@ -18,7 +18,7 @@ void ASpawnerMonster_TowerDefence::Tick(float DeltaTime)
 
 }
 
-void ASpawnerMonster_TowerDefence::StartSpawning(int iLevel)
+void ASpawnerMonster_TowerDefence::StartSpawning(int32 iLevel)
 {
 	if (m_eCurState == ESpawnerState::Spawning)
 		return;
