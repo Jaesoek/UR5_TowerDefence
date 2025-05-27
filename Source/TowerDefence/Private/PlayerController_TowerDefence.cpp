@@ -2,6 +2,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "../Public/ControlUnit.h"
+#include "../Public/InputComponent_MouseMoving.h"
 
 APlayerController_TowerDefence::APlayerController_TowerDefence()
 {
@@ -12,6 +13,10 @@ APlayerController_TowerDefence::APlayerController_TowerDefence()
 	static ConstructorHelpers::FObjectFinder<UInputAction> IAFinder_MouseClick(TEXT("/Game/TowerDefence/Characters/IA_MouseClick_L"));
 	if (IAFinder_MouseClick.Succeeded())
 		m_pMouseClick = IAFinder_MouseClick.Object;
+	
+	m_pInputComponent_MouseMoving = NewObject<UInputComponent_MouseMoving>(this, UInputComponent_MouseMoving::StaticClass(), TEXT("InputComp_EdgeCheck"));
+	m_pInputComponent_MouseMoving->RegisterComponent();
+	AddInstanceComponent(m_pInputComponent_MouseMoving);
 }
 
 void APlayerController_TowerDefence::BeginPlay()
@@ -43,28 +48,10 @@ void APlayerController_TowerDefence::SetupInputComponent()
 void APlayerController_TowerDefence::PlayerTick(float fDeltaTime)
 {
 	Super::PlayerTick(fDeltaTime);
-
-	float MouseX, MouseY;
-	if (!GetMousePosition(MouseX, MouseY))
-		return;
 	
-	int32 iViewportSizeX, iViewportSizeY;
-	GetViewportSize(iViewportSizeX, iViewportSizeY);
-
-	const float EdgeThreshold = 20.0f;
-	FVector2D CameraDirection = FVector2D::ZeroVector;
-
-	if (MouseX <= EdgeThreshold)
-		CameraDirection.X = -1.0f;
-	else if (MouseX >= iViewportSizeX - EdgeThreshold)
-		CameraDirection.X = 1.0f;
-
-	if (MouseY <= EdgeThreshold)
-		CameraDirection.Y = 1.0f;
-	else if (MouseY >= iViewportSizeY - EdgeThreshold)
-		CameraDirection.Y = -1.0f;
-
-	if (!CameraDirection.IsZero())
+	FVector2D CameraDirection{};
+	bool isEdgeChecked = m_pInputComponent_MouseMoving->EdgeChecking(CameraDirection);
+	if (isEdgeChecked)
 		MoveCamera(CameraDirection, fDeltaTime);
 }
 

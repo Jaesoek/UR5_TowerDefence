@@ -24,6 +24,8 @@ protected:
 	void HandleMouseClick(const FInputActionValue& Value);
 	void MoveCamera(FVector2D vMove, float fDeltaTime);
 
+protected:
+	class UInputComponent_MouseMoving* m_pInputComponent_MouseMoving;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
