@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -9,11 +7,10 @@
 UENUM()
 enum class ERoundState : uint8
 {
-	WaitingToStart,
-	RoundWaiting,
-	RoundInProgress,
-	RoundEnded,
-	RoundMax
+	Round_Waiting,
+	Round_InProgress,
+	Round_Finished,
+	RoundMAX
 };
 
 UCLASS()
@@ -24,36 +21,34 @@ class TOWERDEFENCE_API AGameState_TowerDefence : public AGameState
 public:
 	AGameState_TowerDefence();
 
-	virtual void WaitRound();
-
 protected:
 	// GameState Interface
 	virtual void HandleMatchHasStarted() override;
 	// ~GameState Interface
 
+	virtual void WaitRound();
 	virtual void StartRound();
 	virtual void EndGame();
 	virtual void WaveFinished(bool isSurvive);
 	virtual void SetGameState(ERoundState InRoundState);
 
-	UPROPERTY(BlueprintReadOnly)
-	ERoundState m_curGameState;
-	
-	UPROPERTY(Transient)
-	TArray<AActor*> m_arrSpawners;
-
-	UPROPERTY(EditDefaultsOnly)
-	float m_fRoundWaitTime;
-
 	UPROPERTY(Transient)
 	int32 m_iCurLevel;
 
-	DECLARE_MULTICAST_DELEGATE(FOnStateChanged)
-	FOnStateChanged OnStateChangedEvent[4];
+	UPROPERTY(BlueprintReadOnly)
+	ERoundState m_curRoundState;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Round Rule Setting")
+	float m_fRoundWaitTime;
+
 
 	DECLARE_MULTICAST_DELEGATE(FOnStartRound)
 	FOnStartRound OnStartRoundEvent;
 
+	DECLARE_MULTICAST_DELEGATE(FOnStateChanged)
+	FOnStateChanged OnStateChangedEvent[(uint8)ERoundState::RoundMAX];
+
 public:
-	FOnStartRound GetStartRoundEvent() { return OnStartRoundEvent;	}
+	FOnStartRound GetStartRoundEvent() { return OnStartRoundEvent; }
+	FOnStateChanged GetStateChanged(ERoundState roundState) { return OnStateChangedEvent[(uint8)roundState]; }
 };

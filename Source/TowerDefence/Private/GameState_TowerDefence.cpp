@@ -1,36 +1,23 @@
 #include "GameState_TowerDefence.h"
 #include "EngineUtils.h"
 #include "TimerManager.h"
-#include "../Public/SpawnerMonster_TowerDefence.h"
 
 AGameState_TowerDefence::AGameState_TowerDefence()
-	: m_curGameState(ERoundState::WaitingToStart)
-	, m_fRoundWaitTime(2.f)
+	: m_fRoundWaitTime(2.f)
 	, m_iCurLevel(0)
 {
-	
 }
 
 void AGameState_TowerDefence::HandleMatchHasStarted()
 {
 	Super::HandleMatchHasStarted();
 
-	for (TActorIterator<ASpawnerMonster_TowerDefence> It(GetWorld()); It; ++It)
-	{
-		m_arrSpawners.Add(*It);
-	}
-
 	WaitRound();
 }
 
 void AGameState_TowerDefence::WaitRound()
 {
-	if (m_arrSpawners.IsEmpty())
-	{
-		return;
-	}
-
-	m_curGameState = ERoundState::RoundWaiting;
+	SetGameState(ERoundState::Round_Waiting);
 
 	FTimerHandle TimerHandle_StartRound;
 	GetWorld()->GetTimerManager().SetTimer(
@@ -46,26 +33,12 @@ void AGameState_TowerDefence::StartRound()
 {
 	m_iCurLevel += 1;
 
-	m_curGameState = ERoundState::RoundInProgress;
-
-	OnStartRoundEvent.Broadcast();
-
-	//for (auto& pSpawnerRef : m_arrSpawners)
-	//{
-	//	if (ASpawnerMonster_TowerDefence* pSpawner = Cast<ASpawnerMonster_TowerDefence>(pSpawnerRef))
-	//	{
-	//		pSpawner->StartSpawning(m_iCurLevel);
-	//		pSpawner->OnWaveFinished.AddUObject(this, &AGameState_TowerDefence::WaveFinished);
-	//	}
-	//}
+	SetGameState(ERoundState::Round_InProgress);
 }
 
 void AGameState_TowerDefence::EndGame()
 {
-	m_curGameState = ERoundState::WaitingToStart;
-
-	// 모든 객체가 뒤졌거나 게임 종료시 처리
-
+	SetGameState(ERoundState::Round_Waiting);
 }
 
 void AGameState_TowerDefence::WaveFinished(bool isSurvive)
@@ -82,13 +55,13 @@ void AGameState_TowerDefence::WaveFinished(bool isSurvive)
 
 void AGameState_TowerDefence::SetGameState(ERoundState InRoundState)
 {
-	if (m_curGameState != InRoundState)
+	if (m_curRoundState != InRoundState)
 	{
-		m_curGameState = InRoundState;
+		m_curRoundState = InRoundState;
 
-		if (OnStateChangedEvent[(int)m_curGameState].IsBound())
+		if (OnStateChangedEvent[(uint8)m_curRoundState].IsBound())
 		{
-			OnStateChangedEvent[(int)m_curGameState].Broadcast();
+			OnStateChangedEvent[(uint8)m_curRoundState].Broadcast();
 		}
 	}
 }

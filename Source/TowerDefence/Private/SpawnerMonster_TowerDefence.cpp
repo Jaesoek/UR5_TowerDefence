@@ -1,33 +1,15 @@
 #include "SpawnerMonster_TowerDefence.h"
+#include "../Public/GameState_TowerDefence.h"
 
 
 ASpawnerMonster_TowerDefence::ASpawnerMonster_TowerDefence()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 }
 
-void ASpawnerMonster_TowerDefence::BeginPlay()
+void ASpawnerMonster_TowerDefence::SpawnMonsters()
 {
-	Super::BeginPlay();	
+	auto pGameState = GetWorld()->GetGameState<AGameState_TowerDefence>();
+	pGameState->GetStartRoundEvent().AddUObject(this, &ASpawnerMonster_TowerDefence::SpawnMonsters);
 }
-
-void ASpawnerMonster_TowerDefence::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
-void ASpawnerMonster_TowerDefence::StartSpawning(int32 iLevel)
-{
-	if (m_eCurState == ESpawnerState::Spawning)
-		return;
-
-	m_eCurState = ESpawnerState::Spawning;
-	
-	// 몇 마리
-	// 어떤놈?
-	// log(iLevel) * 10 + 10;
-	// Timer 동작 시켜서 돌려시발거
-}
-
