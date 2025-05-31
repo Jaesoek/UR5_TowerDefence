@@ -18,24 +18,26 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
-	virtual void PlayerTick(float fDeltaTime) override;
+
+	void HandleMouseClick_L(const FInputActionValue& Value);
+	void HandleMouseClick_R(const FInputActionValue& Value);
+	void HandleMouseMove(const FInputActionValue& Value);
 
 protected:
-	void HandleMouseClick(const FInputActionValue& Value);
-	void MoveCamera(FVector2D vMove, float fDeltaTime);
+	UPROPERTY(EditDefaultsOnly, Transient, Category = "Input")
+	float m_fCamspeed;
 
-protected:
-	class UInputComponent_MouseMoving* m_pInputComponent_MouseMoving;
-
-protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputMappingContext* m_pDefaultMappingContext;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	UInputAction* m_pMouseClick;
+	UInputAction* m_pIA_MouseClick_L;
 
-protected:
-	float m_fCamspeed = 20.f;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* m_pIA_MouseClick_R;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* m_pIA_MouseMove;
 
 private:
 	TScriptInterface<class IControlUnit> m_pControlUnit;

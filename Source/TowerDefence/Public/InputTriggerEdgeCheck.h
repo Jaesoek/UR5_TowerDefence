@@ -14,9 +14,12 @@ class TOWERDEFENCE_API UInputTriggerEdgeCheck : public UInputTrigger
 {
 	GENERATED_BODY()
 	
+public:
+	UInputTriggerEdgeCheck();
+
 protected:
 	virtual ETriggerState UpdateState_Implementation(const UEnhancedPlayerInput* PlayerInput, FInputActionValue ModifiedValue, float DeltaTime) override;
 
-private:
-	bool GetMousePosition(float& fLocationX, float& fLocationY);
+	UPROPERTY(EditDefaultsOnly, Transient)
+	float EdgeThreshold;
 };
