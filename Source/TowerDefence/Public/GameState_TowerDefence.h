@@ -7,6 +7,7 @@
 UENUM()
 enum class ERoundState : uint8
 {
+	Default,
 	Round_Waiting,
 	Round_InProgress,
 	Round_Finished,
@@ -38,15 +39,14 @@ protected:
 	UPROPERTY(Transient)
 	ERoundState m_curRoundState;
 
+	UPROPERTY(Transient)
+	int32 m_iRemainNum_Monsters;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Round Rule Setting")
 	float m_fRoundWaitTime;
 
-	UPROPERTY(Transient)
-	int32 m_iCurNum_Monsters;
-
 public:
-	int32 GetCurMonsterNum() const { return m_iCurNum_Monsters; }
-	void IncreaseMonster();
+	void SetMonsterNum(int32 iNumMonsters);
 	void DecreaseMonster();
 
 
@@ -55,9 +55,9 @@ protected:
 	FOnStateChanged OnStateChangedEvent[(uint8)ERoundState::RoundMAX];
 
 public:
-	FOnStateChanged GetStateChanged(ERoundState roundState) { return OnStateChangedEvent[(uint8)roundState]; }
+	FOnStateChanged& GetStateChanged(ERoundState roundState) { return OnStateChangedEvent[(uint8)roundState]; }
 
-	FOnStateChanged GetWaitRoundEvent() { return OnStateChangedEvent[(uint8)ERoundState::Round_Waiting]; }
-	FOnStateChanged GetStartRoundEvent() { return OnStateChangedEvent[(uint8)ERoundState::Round_InProgress]; }
-	FOnStateChanged GetFinishRoundEvent() { return OnStateChangedEvent[(uint8)ERoundState::Round_Finished]; }
+	FOnStateChanged& GetWaitRoundEvent() { return OnStateChangedEvent[(uint8)ERoundState::Round_Waiting]; }
+	FOnStateChanged& GetStartRoundEvent() { return OnStateChangedEvent[(uint8)ERoundState::Round_InProgress]; }
+	FOnStateChanged& GetFinishRoundEvent() { return OnStateChangedEvent[(uint8)ERoundState::Round_Finished]; }
 };
