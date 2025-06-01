@@ -10,13 +10,6 @@ AGameState_TowerDefence::AGameState_TowerDefence()
 {
 }
 
-void AGameState_TowerDefence::HandleMatchHasStarted()
-{
-	Super::HandleMatchHasStarted();
-
-	WaitRound();
-}
-
 void AGameState_TowerDefence::WaitRound()
 {
 	if (false == HasAuthority())

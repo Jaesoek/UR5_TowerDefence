@@ -15,7 +15,7 @@ enum class ERoundState : uint8
 };
 
 UCLASS()
-class TOWERDEFENCE_API AGameState_TowerDefence : public AGameState
+class TOWERDEFENCE_API AGameState_TowerDefence : public AGameStateBase
 {
 	GENERATED_BODY()
 	
@@ -24,7 +24,6 @@ public:
 
 protected:
 	// GameState Interface
-	virtual void HandleMatchHasStarted() override;
 	// ~GameState Interface
 
 	virtual void WaitRound();
