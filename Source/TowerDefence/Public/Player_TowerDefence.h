@@ -13,6 +13,11 @@ public:
 	APlayer_TowerDefence();
 
 protected:
+	virtual void Tick(float DeltaSeconds) override;
+
+	bool CheckEdge(FVector2D& v2MouseDir);
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (DisableEditOnInstance))
 	class UCameraComponent* TopDownCameraComponent;
 
@@ -21,4 +26,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MovementInfo)
 	float m_fCamSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player Info")
+	int32 m_iPlayer_Hp;
+
+public:
+	int32 GetPlayerHp() const { return m_iPlayer_Hp; }
 };

@@ -29,26 +29,35 @@ protected:
 	virtual void WaitRound();
 	virtual void StartRound();
 	virtual void EndGame();
-	virtual void WaveFinished(bool isSurvive);
-	virtual void SetGameState(ERoundState InRoundState);
 
+	virtual void SetGameState(ERoundState InRoundState);
+	
 	UPROPERTY(Transient)
 	int32 m_iCurLevel;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(Transient)
 	ERoundState m_curRoundState;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Round Rule Setting")
 	float m_fRoundWaitTime;
 
+	UPROPERTY(Transient)
+	int32 m_iCurNum_Monsters;
 
-	DECLARE_MULTICAST_DELEGATE(FOnStartRound)
-	FOnStartRound OnStartRoundEvent;
+public:
+	int32 GetCurMonsterNum() const { return m_iCurNum_Monsters; }
+	void IncreaseMonster();
+	void DecreaseMonster();
 
+
+protected:
 	DECLARE_MULTICAST_DELEGATE(FOnStateChanged)
 	FOnStateChanged OnStateChangedEvent[(uint8)ERoundState::RoundMAX];
 
 public:
-	FOnStartRound GetStartRoundEvent() { return OnStartRoundEvent; }
 	FOnStateChanged GetStateChanged(ERoundState roundState) { return OnStateChangedEvent[(uint8)roundState]; }
+
+	FOnStateChanged GetWaitRoundEvent() { return OnStateChangedEvent[(uint8)ERoundState::Round_Waiting]; }
+	FOnStateChanged GetStartRoundEvent() { return OnStateChangedEvent[(uint8)ERoundState::Round_InProgress]; }
+	FOnStateChanged GetFinishRoundEvent() { return OnStateChangedEvent[(uint8)ERoundState::Round_Finished]; }
 };

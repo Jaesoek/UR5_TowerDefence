@@ -3,8 +3,9 @@
 #include "TimerManager.h"
 
 AGameState_TowerDefence::AGameState_TowerDefence()
-	: m_fRoundWaitTime(2.f)
-	, m_iCurLevel(0)
+	: m_fRoundWaitTime{ 2.f }
+	, m_iCurLevel{ 0 }
+	, m_iCurNum_Monsters{ 0 }
 {
 }
 
@@ -38,19 +39,7 @@ void AGameState_TowerDefence::StartRound()
 
 void AGameState_TowerDefence::EndGame()
 {
-	SetGameState(ERoundState::Round_Waiting);
-}
-
-void AGameState_TowerDefence::WaveFinished(bool isSurvive)
-{
-	if (isSurvive)
-	{
-		WaitRound();
-	}		
-	else
-	{
-		EndGame();
-	}
+	SetGameState(ERoundState::Round_Finished);
 }
 
 void AGameState_TowerDefence::SetGameState(ERoundState InRoundState)
@@ -63,5 +52,21 @@ void AGameState_TowerDefence::SetGameState(ERoundState InRoundState)
 		{
 			OnStateChangedEvent[(uint8)m_curRoundState].Broadcast();
 		}
+	}
+}
+
+void AGameState_TowerDefence::IncreaseMonster()
+{
+	if (HasAuthority())
+	{
+		++m_iCurNum_Monsters;
+	}
+}
+
+void AGameState_TowerDefence::DecreaseMonster()
+{
+	if (HasAuthority())
+	{
+		--m_iCurNum_Monsters;
 	}
 }

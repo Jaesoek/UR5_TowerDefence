@@ -13,5 +13,7 @@ public:
 	ASpawnerMonster_TowerDefence();
 
 protected:
+	virtual void BeginPlay() override;
+	
 	virtual void SpawnMonsters();
 };

@@ -24,9 +24,6 @@ protected:
 	void HandleMouseMove(const FInputActionValue& Value);
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Transient, Category = "Input")
-	float m_fCamspeed;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputMappingContext* m_pDefaultMappingContext;
 

@@ -2,24 +2,23 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "../Public/ControlUnit.h"
-#include "../Public/InputComponent_MouseMoving.h"
+#include "../Public/Player_TowerDefence.h"
 
 APlayerController_TowerDefence::APlayerController_TowerDefence()
-	: m_fCamspeed{ 20.f }
 {
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMCFinder_Spectator(TEXT("/Game/TowerDefence/Characters/IMC_Spectator"));
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMCFinder_Spectator(TEXT("/Game/TowerDefence/Player/Input/IMC_Move"));
 	if (IMCFinder_Spectator.Succeeded())
 		m_pDefaultMappingContext = IMCFinder_Spectator.Object;
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> IAFinder_MouseMove(TEXT("/Game/TowerDefence/Characters/IA_MouseMoving"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> IAFinder_MouseMove(TEXT("/Game/TowerDefence/Player/Input/IA_MouseMoving"));
 	if (IAFinder_MouseMove.Succeeded())
 		m_pIA_MouseMove = IAFinder_MouseMove.Object;
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> IAFinder_MouseClick_L(TEXT("/Game/TowerDefence/Characters/IA_MouseClick_L"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> IAFinder_MouseClick_L(TEXT("/Game/TowerDefence/Player/Input/IA_MouseClick_L"));
 	if (IAFinder_MouseClick_L.Succeeded())
 		m_pIA_MouseClick_L = IAFinder_MouseClick_L.Object;
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> IAFinder_MouseClick_R(TEXT("/Game/TowerDefence/Characters/IA_MouseClick_R"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> IAFinder_MouseClick_R(TEXT("/Game/TowerDefence/Player/Input/IA_MouseClick_R"));
 	if (IAFinder_MouseClick_R.Succeeded())
 		m_pIA_MouseClick_R = IAFinder_MouseClick_R.Object;
 }
@@ -57,7 +56,9 @@ void APlayerController_TowerDefence::HandleMouseClick_L(const FInputActionValue&
 	FHitResult HitResult;
 	GetHitResultUnderCursor(ECC_Camera, false, HitResult);
 	if (!HitResult.bBlockingHit)
+	{
 		return;
+	}
 
 	if (IsValid(m_pControlUnit.GetObject()))
 	{
@@ -70,17 +71,24 @@ void APlayerController_TowerDefence::HandleMouseClick_R(const FInputActionValue&
 	FHitResult HitResult;
 	GetHitResultUnderCursor(ECC_Camera, false, HitResult);
 	if (!HitResult.bBlockingHit)
+	{
 		return;
-
+	}
+	
 	m_pControlUnit = HitResult.GetActor();
 	if (m_pControlUnit && m_pControlUnit.GetInterface() != nullptr)
+	{
 		m_pControlUnit->OnFocused();
+	}
 	else
+	{
 		m_pControlUnit = nullptr;
+	}
 }
 
 void APlayerController_TowerDefence::HandleMouseMove(const FInputActionValue& Value)
 {
 	FVector2D vMouse = Value.Get<FVector2D>();
-	GetPawn()->AddMovementInput({ vMouse.Y, vMouse.X, 0.f }, m_fCamspeed);
+
+	GetPawn()->AddMovementInput({ vMouse.Y, vMouse.X, 0.f });
 }

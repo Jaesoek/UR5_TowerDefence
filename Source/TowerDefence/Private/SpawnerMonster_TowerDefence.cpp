@@ -8,8 +8,15 @@ ASpawnerMonster_TowerDefence::ASpawnerMonster_TowerDefence()
 
 }
 
+void ASpawnerMonster_TowerDefence::BeginPlay()
+{
+	Super::BeginPlay();
+
+	AGameState_TowerDefence* pGameState = GetWorld()->GetGameState<AGameState_TowerDefence>();
+	pGameState->GetStartRoundEvent().AddUObject(this, &ASpawnerMonster_TowerDefence::SpawnMonsters);
+}
+
 void ASpawnerMonster_TowerDefence::SpawnMonsters()
 {
-	auto pGameState = GetWorld()->GetGameState<AGameState_TowerDefence>();
-	pGameState->GetStartRoundEvent().AddUObject(this, &ASpawnerMonster_TowerDefence::SpawnMonsters);
+	
 }
