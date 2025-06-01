@@ -55,9 +55,9 @@ protected:
 	FOnStateChanged OnStateChangedEvent[(uint8)ERoundState::RoundMAX];
 
 public:
-	FOnStateChanged& GetStateChanged(ERoundState roundState) { return OnStateChangedEvent[(uint8)roundState]; }
-
-	FOnStateChanged& GetWaitRoundEvent() { return OnStateChangedEvent[(uint8)ERoundState::Round_Waiting]; }
-	FOnStateChanged& GetStartRoundEvent() { return OnStateChangedEvent[(uint8)ERoundState::Round_InProgress]; }
-	FOnStateChanged& GetFinishRoundEvent() { return OnStateChangedEvent[(uint8)ERoundState::Round_Finished]; }
+	template <typename UserClass>
+	void RegistEvent_StartRound(UserClass* InObject, typename TMemFunPtrType<false, UserClass, void()>::Type InFunc)
+	{
+		OnStateChangedEvent[(uint8)ERoundState::Round_InProgress].AddUObject(InObject, InFunc);
+	}
 };

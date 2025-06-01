@@ -45,7 +45,6 @@ void APlayerController_TowerDefence::SetupInputComponent()
 	// IA
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
 	{
-		EnhancedInputComponent->BindAction(m_pIA_MouseMove, ETriggerEvent::Triggered, this, &APlayerController_TowerDefence::HandleMouseMove);
 		EnhancedInputComponent->BindAction(m_pIA_MouseClick_L, ETriggerEvent::Completed, this, &APlayerController_TowerDefence::HandleMouseClick_L);
 		EnhancedInputComponent->BindAction(m_pIA_MouseClick_R, ETriggerEvent::Completed, this, &APlayerController_TowerDefence::HandleMouseClick_R);
 	}
@@ -74,21 +73,19 @@ void APlayerController_TowerDefence::HandleMouseClick_R(const FInputActionValue&
 	{
 		return;
 	}
-	
-	m_pControlUnit = HitResult.GetActor();
-	if (m_pControlUnit && m_pControlUnit.GetInterface() != nullptr)
-	{
-		m_pControlUnit->OnFocused();
-	}
-	else
-	{
-		m_pControlUnit = nullptr;
-	}
-}
 
-void APlayerController_TowerDefence::HandleMouseMove(const FInputActionValue& Value)
-{
-	FVector2D vMouse = Value.Get<FVector2D>();
+	IControlUnit* pControlUnit = Cast<IControlUnit>(HitResult.GetActor());
+	if (nullptr != pControlUnit)
+	{
+		m_pControlUnit = HitResult.GetActor();
+		if (m_pControlUnit && m_pControlUnit.GetInterface() != nullptr)
+		{
+			m_pControlUnit->OnFocused();
+		}
+		else
+		{
+			m_pControlUnit = nullptr;
+		}
+	}
 
-	GetPawn()->AddMovementInput({ vMouse.Y, vMouse.X, 0.f });
 }

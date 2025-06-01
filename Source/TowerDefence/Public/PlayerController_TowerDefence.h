@@ -21,7 +21,6 @@ protected:
 
 	void HandleMouseClick_L(const FInputActionValue& Value);
 	void HandleMouseClick_R(const FInputActionValue& Value);
-	void HandleMouseMove(const FInputActionValue& Value);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")

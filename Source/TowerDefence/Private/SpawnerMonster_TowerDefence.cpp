@@ -20,7 +20,7 @@ void ASpawnerMonster_TowerDefence::BeginPlay()
 	AGameState_TowerDefence* pGameState = GetWorld()->GetGameState<AGameState_TowerDefence>();
 	if (IsValid(pGameState))
 	{
-		pGameState->GetStartRoundEvent().AddUObject(this, &ASpawnerMonster_TowerDefence::StartSpawning);
+		pGameState->RegistEvent_StartRound(this, &ASpawnerMonster_TowerDefence::StartSpawning);
 	}
 	else
 	{
