@@ -1,6 +1,9 @@
 # Visual Studio 2015 user specific files
 .vs/
 
+# Custom Ignore files
+Content/ParagonSparrow/*
+
 # Compiled Object files
 *.slo
 *.lo
