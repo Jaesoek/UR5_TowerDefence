@@ -10,10 +10,10 @@ ABaseTower::ABaseTower()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	m_Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
-	if (m_Mesh)
+	m_SKMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
+	if (m_SKMesh)
 	{
-		m_Mesh->SetupAttachment(RootComponent);
+		m_SKMesh->SetupAttachment(RootComponent);
 	}
 
 	m_pAttackRange = CreateDefaultSubobject<USphereComponent>(TEXT("DetectionSphere"));
@@ -55,31 +55,12 @@ void ABaseTower::OnMonsterExit(UPrimitiveComponent* OverlappedComp, AActor* Othe
 	}
 }
 
-void ABaseTower::SetCurTarget(AActor* pActor)
-{
-	if (pActor != nullptr)
-	{
-		m_pCurTarget = pActor;
-		return;
-	}
-
-	TArray<AActor*> arrActors;
-	m_pAttackRange->GetOverlappingActors(arrActors);
-	for (auto iter = arrActors.CreateIterator(); iter; ++iter)
-	{
-		if (IsValid(*iter))
-		{
-			m_pCurTarget = *iter;
-		}
-	}
-}
-
 bool ABaseTower::Attack()
 {
 	//IsValid(m_pCurTarget) &&
-	if (IsValid(AttackMontage) && !m_Mesh->GetAnimInstance()->Montage_IsPlaying(AttackMontage))
+	if (IsValid(AttackMontage) && !m_SKMesh->GetAnimInstance()->Montage_IsPlaying(AttackMontage))
 	{
-		m_Mesh->GetAnimInstance()->Montage_Play(AttackMontage);
+		m_SKMesh->GetAnimInstance()->Montage_Play(AttackMontage);
 		return true;
 	}
 
@@ -97,5 +78,25 @@ void ABaseTower::FollowTo(FVector& vTargetPos)
 	if (fLengthSq > 2.f)
 	{
 		SetActorLocation(vTargetPos);
+	}
+}
+
+void ABaseTower::SetCurTarget(AActor* pActor)
+{
+	if (pActor != nullptr)
+	{
+		m_pCurTarget = pActor;
+
+		return;
+	}
+
+	TArray<AActor*> arrActors;
+	m_pAttackRange->GetOverlappingActors(arrActors);
+	for (auto iter = arrActors.CreateIterator(); iter; ++iter)
+	{
+		if (IsValid(*iter))
+		{
+			m_pCurTarget = *iter;
+		}
 	}
 }

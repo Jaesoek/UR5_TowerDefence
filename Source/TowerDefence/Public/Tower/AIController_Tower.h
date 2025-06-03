@@ -16,5 +16,5 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI Setting")
 	TObjectPtr<class UBehaviorTree> m_BehaviorTree;
-	
+
 };

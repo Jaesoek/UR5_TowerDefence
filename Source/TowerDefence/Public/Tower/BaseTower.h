@@ -33,9 +33,6 @@ protected:
 	virtual void OnMonsterExit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	UPROPERTY(Transient)
-	TObjectPtr<AActor>		m_pCurTarget;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Attack")
 	TObjectPtr<class USphereComponent> m_pAttackRange;
 
@@ -43,12 +40,16 @@ protected:
 	TObjectPtr<UAnimMontage> AttackMontage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
-	TObjectPtr<class USkeletalMeshComponent> m_Mesh;
+	TObjectPtr<class USkeletalMeshComponent> m_SKMesh;
 
-private:
-	void SetCurTarget(AActor* pActor = nullptr);
+	UPROPERTY(Transient)
+	TObjectPtr<AActor>		m_pCurTarget;
 
 public:
 	virtual bool Attack() final;
-	virtual void FollowTo(FVector& vTargetPos) final;
+
+	virtual void FollowTo(FVector& vTargetPos) final;	// 임시: 로직정리되면 지울게요
+
+private:
+	void SetCurTarget(AActor* pActor = nullptr);
 };
