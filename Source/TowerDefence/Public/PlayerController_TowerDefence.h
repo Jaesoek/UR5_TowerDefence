@@ -5,6 +5,7 @@
 #include "InputActionValue.h"
 #include "InputMappingContext.h"
 #include "InputAction.h"
+#include "Tower/BaseTower.h"
 #include "PlayerController_TowerDefence.generated.h"
 
 UCLASS()
@@ -19,22 +20,31 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 
-	void HandleMouseClick_L(const FInputActionValue& Value);
-	void HandleMouseClick_R(const FInputActionValue& Value);
+	void HandleSelectActor(const FInputActionValue& Value);
+	void HandelMoveTo(const FInputActionValue& Value);
+	void HandelBuild(const FInputActionValue& Value);
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	UInputMappingContext* m_pDefaultMappingContext;
+	UPROPERTY(EditDefaultsOnly, Category = "Input Mode")
+	TObjectPtr<UInputMappingContext> m_pDefaultMappingContext;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	UInputAction* m_pIA_MouseClick_L;
+	UPROPERTY(EditDefaultsOnly, Category = "Input Mode")
+	TObjectPtr<UInputMappingContext> m_pBuildMappingContext;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	UInputAction* m_pIA_MouseClick_R;
+	UPROPERTY(EditDefaultsOnly, Category = "Input Action")
+	TObjectPtr<UInputAction> m_pIA_SelectActor;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	UInputAction* m_pIA_MouseMove;
+	UPROPERTY(EditDefaultsOnly, Category = "Input Action")
+	TObjectPtr<UInputAction> m_pIA_MoveTo;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input Action")
+	TObjectPtr<UInputAction> m_pIA_Build;
+
+
+	UPROPERTY(EditDefaultsOnly, Category = "Tower")
+	TSubclassOf<ABaseTower> DefaultTower;
+
 
 private:
-	TScriptInterface<class IControlUnit> m_pControlUnit;
+	TScriptInterface<class IControlUnit>	m_pControlUnit;
 };
