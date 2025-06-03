@@ -5,8 +5,8 @@
 #include "GameFramework/SpringArmComponent.h"
 
 APlayer_TowerDefence::APlayer_TowerDefence()
-	: m_iPlayer_Hp{ 10 }
-	, m_fCamSpeed{ 10 }
+	: m_fCamSpeed(10)
+	, m_iPlayer_Hp(10)
 {
 	SetCanBeDamaged(false);
 

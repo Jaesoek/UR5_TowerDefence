@@ -3,10 +3,10 @@
 #include "TimerManager.h"
 
 AGameState_TowerDefence::AGameState_TowerDefence()
-	: m_fRoundWaitTime{ 2.f }
-	, m_iCurLevel{ 0 }
-	, m_iRemainNum_Monsters{ 0 }
+	: m_iCurLevel(0)
 	, m_curRoundState{ ERoundState::Default }
+	, m_iRemainNum_Monsters(0)
+	, m_fRoundWaitTime(2.f)
 {
 }
 
