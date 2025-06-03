@@ -3,6 +3,8 @@
 
 # Custom Ignore files
 Content/ParagonSparrow/*
+Content/ParagonGrux/*
+.vscode
 
 # Compiled Object files
 *.slo

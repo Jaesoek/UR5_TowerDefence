@@ -22,6 +22,9 @@ class TOWERDEFENCE_API AGameState_TowerDefence : public AGameStateBase
 public:
 	AGameState_TowerDefence();
 
+	virtual void SetGameState(ERoundState InRoundState);
+	FORCEINLINE virtual int32 GetCurrentLevel() { return m_iCurLevel; }
+
 protected:
 	// GameState Interface
 	// ~GameState Interface
@@ -30,8 +33,6 @@ protected:
 	virtual void StartRound();
 	virtual void EndGame();
 
-	virtual void SetGameState(ERoundState InRoundState);
-	
 	UPROPERTY(Transient)
 	int32 m_iCurLevel;
 

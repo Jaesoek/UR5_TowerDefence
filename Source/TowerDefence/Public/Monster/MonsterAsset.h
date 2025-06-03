@@ -7,24 +7,29 @@
 #include "Types/CombatType.h"
 #include "MonsterAsset.generated.h"
 
+class AMonsterBase_TowerDefence;
+
 UCLASS()
 class TOWERDEFENCE_API UMonsterAsset : public UDataAsset
 {
 	GENERATED_BODY()
 	
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Monster")
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Visible")
+	TSubclassOf<AMonsterBase_TowerDefence> MonsterClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Visible")
 	FString MonsterName;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Monster")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Visible")
 	TSoftObjectPtr<USkeletalMesh> MonsterMesh;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Monster")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Stats")
 	int Health;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Monster")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Stats")
 	int Armor;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Monster")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Stats")
 	EArmorType ArmorType;
 };
