@@ -91,5 +91,5 @@ void APlayerController_TowerDefence::HandelBuild(const FInputActionValue& Value)
 		params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		return params;
 		}();
-	GetWorld()->SpawnActor<ABaseTower>(DefaultTower, HitResult.Location, FRotator::ZeroRotator, spawnParams);
+	GetWorld()->SpawnActor<ATowerBase>(DefaultTower, HitResult.Location, FRotator::ZeroRotator, spawnParams);
 }

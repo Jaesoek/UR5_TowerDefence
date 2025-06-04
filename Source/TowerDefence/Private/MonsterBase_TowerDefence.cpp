@@ -5,7 +5,7 @@
 
 AMonsterBase_TowerDefence::AMonsterBase_TowerDefence()
 {
-	PrimaryActorTick.bCanEverTick = false; // ´çÀå ¾È¾²´Ï ºñÈ°¼ºÈ­
+	PrimaryActorTick.bCanEverTick = false; // ï¿½ï¿½ï¿½ï¿½ ï¿½È¾ï¿½ï¿½ï¿½ ï¿½ï¿½È°ï¿½ï¿½È­
 	
 	AIControllerClass = AMonsterAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;

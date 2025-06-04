@@ -1,12 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Tower/BaseTower.h"
+#include "Tower/TowerBase.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/SphereComponent.h"
+#include "MonsterBase_TowerDefence.h"
 
-ABaseTower::ABaseTower()
+ATowerBase::ATowerBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -20,12 +21,12 @@ ABaseTower::ABaseTower()
 	if (m_pAttackRange)
 	{
 		m_pAttackRange->SetupAttachment(RootComponent);
-		m_pAttackRange->OnComponentBeginOverlap.AddDynamic(this, &ABaseTower::OnMonsterEnter);
-		m_pAttackRange->OnComponentEndOverlap.AddDynamic(this, &ABaseTower::OnMonsterExit);
+		m_pAttackRange->OnComponentBeginOverlap.AddDynamic(this, &ATowerBase::OnMonsterEnter);
+		m_pAttackRange->OnComponentEndOverlap.AddDynamic(this, &ATowerBase::OnMonsterExit);
 	}
 }
 
-void ABaseTower::BeginPlay()
+void ATowerBase::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -35,10 +36,10 @@ void ABaseTower::BeginPlay()
 	);
 }
 
-void ABaseTower::OnMonsterEnter(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+void ATowerBase::OnMonsterEnter(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor && OtherActor->ActorHasTag("Monster"))
+	if (OtherActor && Cast<AMonsterBase_TowerDefence>(OtherActor))
 	{
 		if (!IsValid(m_pCurTarget))
 		{
@@ -47,7 +48,7 @@ void ABaseTower::OnMonsterEnter(UPrimitiveComponent* OverlappedComp, AActor* Oth
 	}
 }
 
-void ABaseTower::OnMonsterExit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void ATowerBase::OnMonsterExit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if (m_pCurTarget == OtherActor)
 	{
@@ -55,7 +56,7 @@ void ABaseTower::OnMonsterExit(UPrimitiveComponent* OverlappedComp, AActor* Othe
 	}
 }
 
-bool ABaseTower::Attack()
+bool ATowerBase::Attack()
 {
 	//IsValid(m_pCurTarget) &&
 	if (IsValid(AttackMontage) && !m_SKMesh->GetAnimInstance()->Montage_IsPlaying(AttackMontage))
@@ -67,21 +68,20 @@ bool ABaseTower::Attack()
 	return false;
 }
 
-void ABaseTower::FollowTo(FVector& vTargetPos)
+void ATowerBase::FollowTo(FVector& vTargetPos)
 {
-	if (m_eStatus != ETowerState::STATE_READY)
-	{
-		return;
-	}
+	//if (m_eStatus != ETowerState::STATE_READY)
+	//{
+	//	return;
+	//}
 
-	double fLengthSq = (vTargetPos - GetActorLocation()).SizeSquared();
-	if (fLengthSq > 2.f)
-	{
-		SetActorLocation(vTargetPos);
-	}
+	//if ((vTargetPos - GetActorLocation()).SizeSquared() > 2.f)
+	//{
+	//	SetActorLocation(vTargetPos);
+	//}
 }
 
-void ABaseTower::SetCurTarget(AActor* pActor)
+void ATowerBase::SetCurTarget(AActor* pActor)
 {
 	if (pActor != nullptr)
 	{

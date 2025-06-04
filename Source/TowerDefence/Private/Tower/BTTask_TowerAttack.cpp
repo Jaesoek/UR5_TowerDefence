@@ -2,7 +2,7 @@
 
 
 #include "Tower/BTTask_TowerAttack.h"
-#include "Tower/BaseTower.h"
+#include "Tower/TowerBase.h"
 #include "Tower/AIController_Tower.h"
 
 EBTNodeResult::Type UBTTask_TowerAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -18,7 +18,7 @@ EBTNodeResult::Type UBTTask_TowerAttack::ExecuteTask(UBehaviorTreeComponent& Own
 		return EBTNodeResult::Failed;
 	}
 
-	ABaseTower* controlledPawn = aiControl->GetPawn<ABaseTower>();
+	ATowerBase* controlledPawn = aiControl->GetPawn<ATowerBase>();
 	if (!IsValid(controlledPawn))
 	{
 		return EBTNodeResult::Failed;

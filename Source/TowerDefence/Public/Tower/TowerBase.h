@@ -5,24 +5,15 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Tower/TowerAsset.h"
-#include "BaseTower.generated.h"
-
-UENUM(BlueprintType)
-enum class ETowerState : uint8
-{
-	STATE_READY, STATE_SET, STATE_MAX
-};
+#include "TowerBase.generated.h"
 
 UCLASS()
-class TOWERDEFENCE_API ABaseTower : public APawn
+class TOWERDEFENCE_API ATowerBase : public APawn
 {
 	GENERATED_BODY()
 
-protected:
-	ETowerState m_eStatus;
-
 public:
-	ABaseTower();
+	ATowerBase();
 
 protected:
 	virtual void BeginPlay() override;

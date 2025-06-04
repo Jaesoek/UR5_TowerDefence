@@ -5,7 +5,7 @@
 #include "InputActionValue.h"
 #include "InputMappingContext.h"
 #include "InputAction.h"
-#include "Tower/BaseTower.h"
+#include "Tower/TowerBase.h"
 #include "PlayerController_TowerDefence.generated.h"
 
 UCLASS()
@@ -42,7 +42,7 @@ protected:
 
 
 	UPROPERTY(EditDefaultsOnly, Category = "Tower")
-	TSubclassOf<ABaseTower> DefaultTower;
+	TSubclassOf<ATowerBase> DefaultTower;
 
 
 private:
