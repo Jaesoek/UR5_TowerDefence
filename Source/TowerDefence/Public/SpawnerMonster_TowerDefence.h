@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "../Public/MonsterBase_TowerDefence.h"
+#include "Monster/MonsterBase_TowerDefence.h"
 #include "SpawnerMonster_TowerDefence.generated.h"
 
 UCLASS()

@@ -5,7 +5,7 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/SphereComponent.h"
-#include "MonsterBase_TowerDefence.h"
+#include "Monster/MonsterBase_TowerDefence.h"
 
 ATowerBase::ATowerBase()
 {
