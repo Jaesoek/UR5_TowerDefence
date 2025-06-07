@@ -4,13 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "LevelDesign/GridAsset.h"
 #include "Grid.generated.h"
 
-UENUM()
-enum class EGridType : uint8
-{
-	GRID_NULL, GRID_SPAWN, GRID_PATH, GRID_BUILDABLE, GRID_GOAL
-};
 
 UCLASS()
 class TOWERDEFENCE_API AGrid : public AActor

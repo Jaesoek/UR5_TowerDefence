@@ -4,6 +4,10 @@
 #include "LevelDesign/Grid.h"
 #include "Components/InstancedStaticMeshComponent.h"
 
+#if WITH_EDITOR
+#include "Editor.h"
+#endif
+
 
 AGrid::AGrid()
 	: m_fWidth(10.f), m_fHeight(10), m_iNumCol(2), m_iNumRow(2)
