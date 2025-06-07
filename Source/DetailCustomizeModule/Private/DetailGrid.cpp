@@ -2,7 +2,7 @@
 
 
 #include "DetailGrid.h"
-#include "../../TowerDefence/Public/LevelDesign/GridAsset.h"
+#include "LevelDesign/GridAsset.h"
 #include "DetailLayoutBuilder.h"
 #include "DetailCategoryBuilder.h"
 #include "DetailWidgetRow.h"

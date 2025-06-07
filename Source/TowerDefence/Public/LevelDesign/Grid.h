@@ -18,31 +18,13 @@ public:
 
 protected:
 	virtual void OnConstruction(const FTransform& trans) override;
-
 	virtual void GenerateGrid();
 
-
-	UPROPERTY(EditAnywhere, Category = "Grid Setting", meta = (ClampMin = "10.0", UIMin = "10.0"))
-	float m_fWidth;
-	UPROPERTY(EditAnywhere, Category = "Grid Setting", meta = (ClampMin = "10.0", UIMin = "10.0"))
-	float m_fHeight;
-	UPROPERTY(EditAnywhere, Category = "Grid Setting", meta = (ClampMin = "2", UIMin = "2"))
-	int32 m_iNumRow;
-	UPROPERTY(EditAnywhere, Category = "Grid Setting", meta = (ClampMin = "2", UIMin = "2"))
-	int32 m_iNumCol;
-	UPROPERTY(EditAnywhere, Category = "Grid Setting")
-	TArray<EGridType> m_typeSetter;
-
-#if WITH_EDITOR
-	UFUNCTION(CallInEditor, Category = "Grid Setting")
-	void SetGridBtn();
-#endif
+	UPROPERTY(EditDefaultsOnly, Category = "Grid Setting")
+	TObjectPtr<UGridAsset> m_GridAsset;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Grid Setting")
 	TMap<EGridType, TObjectPtr<UInstancedStaticMeshComponent>>	m_MapMesh;
-
-	UPROPERTY(Transient)
-	TArray<EGridType> m_Cells;
 
 public:
 	UFUNCTION()
@@ -51,6 +33,11 @@ public:
 	UFUNCTION()
 	virtual EGridType GetTileType(const FVector& vInputPos) const;
 
+
+#if WITH_EDITOR
+	UFUNCTION(CallInEditor, Category = "Grid Setting")
+	void SetGridBtn();
+#endif
 
 
 };

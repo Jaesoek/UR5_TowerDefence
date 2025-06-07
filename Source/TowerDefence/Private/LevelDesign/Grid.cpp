@@ -10,7 +10,6 @@
 
 
 AGrid::AGrid()
-	: m_fWidth(10.f), m_fHeight(10), m_iNumCol(2), m_iNumRow(2)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -30,36 +29,29 @@ void AGrid::OnConstruction(const FTransform& trans)
 
 void AGrid::GenerateGrid()
 {
+	if (!IsValid(m_GridAsset))
+	{
+		return;
+	}
+
 	for (auto& instancMesh : m_MapMesh)
 	{
 		instancMesh.Value->ClearInstances();
 	}
 
-	m_Cells.Empty();
-	m_Cells.SetNum(m_iNumRow * m_iNumCol);
+	float CellWidth = m_GridAsset->m_fWidth / m_GridAsset->m_iNumCol;
+	float CellHeight = m_GridAsset->m_fHeight / m_GridAsset->m_iNumRow;
 
-	float CellWidth = m_fWidth / m_iNumCol;
-	float CellHeight = m_fHeight / m_iNumRow;
-
-	for (int32 Row = 0; Row < m_iNumRow; ++Row)
+	for (int32 Row = 0; Row < m_GridAsset->m_iNumRow; ++Row)
 	{
-		for (int32 Col = 0; Col < m_iNumCol; ++Col)
-		{
-			if (m_typeSetter.Num() > Row * m_iNumCol + Col)
-			{
-				m_Cells[Row * m_iNumCol + Col] = m_typeSetter[Row * m_iNumCol + Col];
-			}
-			else
-			{
-				m_Cells[Row * m_iNumCol + Col] = EGridType::GRID_NULL;
-			}
-			
-			if (IsValid(m_MapMesh[m_Cells[Row * m_iNumCol + Col]]))
+		for (int32 Col = 0; Col < m_GridAsset->m_iNumCol; ++Col)
+		{			
+			if (IsValid(m_MapMesh[m_GridAsset->m_cellTypes[Row * m_GridAsset->m_iNumCol + Col]]))
 			{
 				FVector Location = FVector(CellWidth * Col, CellHeight * Row, 0.f);
 				FTransform Transform(FRotator::ZeroRotator, Location, { CellHeight, CellWidth, 1.f });
 
-				m_MapMesh[m_Cells[Row * m_iNumCol + Col]]->AddInstance(Transform);
+				m_MapMesh[m_GridAsset->m_cellTypes[Row * m_GridAsset->m_iNumCol + Col]]->AddInstance(Transform);
 			}
 		}
 	}
@@ -68,6 +60,7 @@ void AGrid::GenerateGrid()
 bool AGrid::AbleToBuild(const FVector& vInputPos, FVector& vBuildPos) const
 {
 
+
 	return false;
 }
 
@@ -75,15 +68,15 @@ EGridType AGrid::GetTileType(const FVector& vPos) const
 {
 	FVector vLocal = vPos - GetActorLocation();
 
-	float fCellWidth = m_fWidth / m_iNumCol;
-	float fCellHeight = m_fHeight / m_iNumRow;
+	float fCellWidth = m_GridAsset->m_fWidth / m_GridAsset->m_iNumCol;
+	float fCellHeight = m_GridAsset->m_fHeight / m_GridAsset->m_iNumRow;
 
 	int32 col = FMath::FloorToInt(vLocal.X / fCellWidth);
 	int32 row = FMath::FloorToInt(vLocal.Y / fCellHeight);
 
-	if (row >= 0 && row < m_iNumRow && col >= 0 && col < m_iNumCol)
+	if (row >= 0 && row < m_GridAsset->m_iNumRow && col >= 0 && col < m_GridAsset->m_iNumCol)
 	{
-		return m_Cells[row * m_iNumCol + col];
+		return m_GridAsset->m_cellTypes[row * m_GridAsset->m_iNumCol + col];
 	}
 	return EGridType::GRID_NULL;
 }

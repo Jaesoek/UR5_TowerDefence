@@ -16,6 +16,9 @@ UCLASS(BlueprintType)
 class TOWERDEFENCE_API UGridAsset : public UDataAsset
 {
 	GENERATED_BODY()
+
+public:
+	UGridAsset();
 	
 public:
 	bool InitCells();
