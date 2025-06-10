@@ -93,6 +93,9 @@ void APlayerController_TowerDefence::HandelBuild(const FInputActionValue& Value)
 		return params;
 		}();
 
+	// TODO List
+	//  어떤걸 생성할지
+	//  Grid 체크
 	FTransform targetTrans = FTransform{ FRotator::ZeroRotator, HitResult.Location, FVector::One() };
 	ATowerBase* pTower = GetWorld()->SpawnActorDeferred<ATowerBase>(
 		ATowerBase::StaticClass(), targetTrans

@@ -58,7 +58,7 @@ void AGrid::InitGrid()
 			if (IsValid(m_mapInsMeshComp[curGridType]))
 			{
 				FVector Location = FVector(CellWidth * Col, CellHeight * Row, 0.f);
-				FTransform Transform(FRotator::ZeroRotator, Location, { CellHeight, CellWidth, 1.f });
+				FTransform Transform(FRotator::ZeroRotator, Location, { CellHeight / 100.f, CellWidth / 100.f, 1.f });
 
 				int32&& newIndex = m_mapInsMeshComp[curGridType]->AddInstance(Transform);
 			}

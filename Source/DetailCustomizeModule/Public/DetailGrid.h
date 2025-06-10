@@ -17,6 +17,7 @@ public:
 	virtual void CustomizeDetails(IDetailLayoutBuilder& DetailBuilder) override;
 
 protected:
+	FSlateColor GetCellColor(int32 Index) const;
 	FText GetButtonText(int32 Index) const;
 	FReply OnCellClicked(int32 Index);
 

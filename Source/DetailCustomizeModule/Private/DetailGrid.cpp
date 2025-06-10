@@ -52,8 +52,14 @@ void FDetailGrid::CustomizeDetails(IDetailLayoutBuilder& DetailBuilder)
 				.Padding(2)
 				[
 					SNew(SButton)
-						.Text(this, &FDetailGrid::GetButtonText, Index)
 						.OnClicked(this, &FDetailGrid::OnCellClicked, Index)
+						.ContentPadding(0)
+						[
+							SNew(SBorder)
+								.BorderImage(FAppStyle::GetBrush("WhiteBrush"))
+								.BorderBackgroundColor(this, &FDetailGrid::GetCellColor, Index)
+								.Padding(FMargin(10.0f))
+						]
 				];
 		}
 
@@ -62,6 +68,26 @@ void FDetailGrid::CustomizeDetails(IDetailLayoutBuilder& DetailBuilder)
 			[
 				RowBox
 			];
+	}
+}
+
+FSlateColor FDetailGrid::GetCellColor(int32 Index) const
+{
+	if (!GridInfo->m_cellTypes.IsValidIndex(Index))
+		return FSlateColor(FLinearColor::Black);
+
+	switch (GridInfo->m_cellTypes[Index])
+	{
+	case EGridType::GRID_SPAWN:
+		return FSlateColor(FLinearColor::Green);
+	case EGridType::GRID_PATH:
+		return FSlateColor(FLinearColor::Blue);
+	case EGridType::GRID_BUILDABLE:
+		return FSlateColor(FLinearColor::White);
+	case EGridType::GRID_GOAL:
+		return FSlateColor(FLinearColor::Yellow);
+	default:
+		return FSlateColor(FLinearColor::Black);
 	}
 }
 

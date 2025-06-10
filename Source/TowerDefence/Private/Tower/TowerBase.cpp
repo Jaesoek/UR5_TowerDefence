@@ -32,6 +32,10 @@ void ATowerBase::PostInitializeComponents()
 
 	if (IsValid(m_SKMesh) && IsValid(m_TowerAsset))	// Set mesh infoes
 	{
+		if (false == m_TowerAsset->TowerMesh.IsValid())
+		{
+			m_TowerAsset->TowerMesh.LoadSynchronous();
+		}
 		m_SKMesh->SetSkeletalMeshAsset(m_TowerAsset->TowerMesh.Get());
 		m_SKMesh->SetAnimInstanceClass(m_TowerAsset->AnimInstance);
 	}
