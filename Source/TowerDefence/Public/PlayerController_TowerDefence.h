@@ -42,7 +42,7 @@ protected:
 
 
 	UPROPERTY(EditDefaultsOnly, Category = "Tower")
-	TSubclassOf<ATowerBase> DefaultTower;
+	TArray<TObjectPtr<UTowerAsset>> ArrayTowerAssets;
 
 
 private:

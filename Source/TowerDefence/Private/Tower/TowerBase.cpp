@@ -26,14 +26,15 @@ ATowerBase::ATowerBase()
 	}
 }
 
-void ATowerBase::BeginPlay()
+void ATowerBase::PostInitializeComponents()
 {
-	Super::BeginPlay();
+	Super::PostInitializeComponents();
 
-	GEngine->AddOnScreenDebugMessage(
-		-1, 1.0f, FColor::Green,
-		TEXT("Tower BeginPlay!")
-	);
+	if (IsValid(m_SKMesh) && IsValid(m_TowerAsset))	// Set mesh infoes
+	{
+		m_SKMesh->SetSkeletalMeshAsset(m_TowerAsset->TowerMesh.Get());
+		m_SKMesh->SetAnimInstanceClass(m_TowerAsset->AnimInstance);
+	}
 }
 
 void ATowerBase::OnMonsterEnter(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
@@ -41,7 +42,7 @@ void ATowerBase::OnMonsterEnter(UPrimitiveComponent* OverlappedComp, AActor* Oth
 {
 	if (OtherActor && Cast<AMonsterBase_TowerDefence>(OtherActor))
 	{
-		if (!IsValid(m_pCurTarget))
+		if (!IsValid(m_pCurTarget.Get()))
 		{
 			SetCurTarget(OtherActor);
 		}
@@ -58,10 +59,15 @@ void ATowerBase::OnMonsterExit(UPrimitiveComponent* OverlappedComp, AActor* Othe
 
 bool ATowerBase::Attack()
 {
-	//IsValid(m_pCurTarget) &&
-	if (IsValid(AttackMontage) && !m_SKMesh->GetAnimInstance()->Montage_IsPlaying(AttackMontage))
+	if (!m_TowerAsset)
 	{
-		m_SKMesh->GetAnimInstance()->Montage_Play(AttackMontage);
+		return false;
+	}
+
+	//IsValid(m_pCurTarget) &&
+	if (IsValid(m_TowerAsset->AttackMontage) && !m_SKMesh->GetAnimInstance()->Montage_IsPlaying(m_TowerAsset->AttackMontage))
+	{
+		m_SKMesh->GetAnimInstance()->Montage_Play(m_TowerAsset->AttackMontage);
 		return true;
 	}
 

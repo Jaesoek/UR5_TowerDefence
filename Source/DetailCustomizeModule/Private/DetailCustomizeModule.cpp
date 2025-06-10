@@ -8,7 +8,7 @@ void FDetailCustomizeModule::StartupModule()
 {
 	FPropertyEditorModule& PropertyEditor =
 		FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
-	PropertyEditor.RegisterCustomClassLayout("GridAsset",
+	PropertyEditor.RegisterCustomClassLayout("Grid",
 		FOnGetDetailCustomizationInstance::CreateStatic(&FDetailGrid::MakeInstance));
 }
 

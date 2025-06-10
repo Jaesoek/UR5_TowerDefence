@@ -4,27 +4,49 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "LevelDesign/GridAsset.h"
 #include "Grid.generated.h"
 
+
+UENUM(BlueprintType)
+enum class EGridType : uint8
+{
+	GRID_NULL, GRID_SPAWN, GRID_PATH, GRID_BUILDABLE, GRID_GOAL
+};
 
 UCLASS()
 class TOWERDEFENCE_API AGrid : public AActor
 {
 	GENERATED_BODY()
-	
+
+friend class FDetailGrid;
+
 public:	
 	AGrid();
 
 protected:
 	virtual void OnConstruction(const FTransform& trans) override;
-	virtual void GenerateGrid();
+	virtual void InitGrid();
 
-	UPROPERTY(EditDefaultsOnly, Category = "Grid Setting")
-	TObjectPtr<UGridAsset> m_GridAsset;
+	UPROPERTY(EditAnywhere, Category = "Grid Setting", meta = (ClampMin = "10.0", UIMin = "10.0"))
+	float m_fWidth;
+	UPROPERTY(EditAnywhere, Category = "Grid Setting", meta = (ClampMin = "10.0", UIMin = "10.0"))
+	float m_fHeight;
+	UPROPERTY(EditAnywhere, Category = "Grid Setting", meta = (ClampMin = "2", UIMin = "2"))
+	int32 m_iNumRow;
+	UPROPERTY(EditAnywhere, Category = "Grid Setting", meta = (ClampMin = "2", UIMin = "2"))
+	int32 m_iNumCol;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Grid Setting")
-	TMap<EGridType, TObjectPtr<UInstancedStaticMeshComponent>>	m_MapMesh;
+	UPROPERTY(VisibleDefaultsOnly)
+	TMap<EGridType, TObjectPtr<UInstancedStaticMeshComponent>>	m_mapInsMeshComp;
+
+	// Editor에서 직접 수정 불가능
+	UPROPERTY(VisibleAnywhere)
+	TArray<EGridType> m_cellTypes;
+	//~ Editor에서 직접 수정 불가능
+
+	UPROPERTY(Transient)
+	TMap<int32, EGridType> m_Indices;	// For follow up datas
+
 
 public:
 	UFUNCTION()
@@ -35,8 +57,7 @@ public:
 
 
 #if WITH_EDITOR
-	UFUNCTION(CallInEditor, Category = "Grid Setting")
-	void SetGridBtn();
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 
 

@@ -16,8 +16,7 @@ public:
 	ATowerBase();
 
 protected:
-	virtual void BeginPlay() override;
-	//virtual void Tick(float DeltaTime) override;
+	virtual void PostInitializeComponents() override;
 
 	virtual void OnMonsterEnter(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -27,16 +26,21 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Attack")
 	TObjectPtr<class USphereComponent> m_pAttackRange;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Attack")
-	TObjectPtr<UAnimMontage> AttackMontage;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh")
+	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<class USkeletalMeshComponent> m_SKMesh;
 
 	UPROPERTY(Transient)
-	TObjectPtr<AActor>		m_pCurTarget;
+	TWeakObjectPtr<AActor>	m_pCurTarget;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UTowerAsset> m_TowerAsset;
 
 public:
+	FORCEINLINE void SetTowerAsset(TObjectPtr<UTowerAsset> towerAsset)
+	{
+		m_TowerAsset = towerAsset;
+	}
+
 	virtual bool Attack() final;
 
 	virtual void FollowTo(FVector& vTargetPos) final;	// 임시: 로직정리되면 지울게요

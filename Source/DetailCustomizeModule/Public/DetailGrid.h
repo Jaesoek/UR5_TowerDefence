@@ -6,13 +6,14 @@
 #include "IDetailCustomization.h"
 
 class IDetailLayoutBuilder;
-class UGridAsset;
+class AGrid;
 
 class DETAILCUSTOMIZEMODULE_API FDetailGrid : public IDetailCustomization
 {
 public:
 	static TSharedRef<IDetailCustomization> MakeInstance();
 
+	virtual void CustomizeDetails(const TSharedPtr<IDetailLayoutBuilder>& DetailBuilder) override;
 	virtual void CustomizeDetails(IDetailLayoutBuilder& DetailBuilder) override;
 
 protected:
@@ -20,5 +21,7 @@ protected:
 	FReply OnCellClicked(int32 Index);
 
 private:
-	TWeakObjectPtr<UGridAsset> GridAsset;
+	TWeakPtr<IDetailLayoutBuilder> DetailBuilderPtr;
+
+	TWeakObjectPtr<AGrid> GridInfo;
 };
