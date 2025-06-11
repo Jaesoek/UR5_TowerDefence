@@ -4,6 +4,7 @@
 #include "../Public/ControlUnit.h"
 #include "../Public/Player_TowerDefence.h"
 #include "Kismet/GameplayStatics.h"
+#include "LevelDesign/Grid.h"
 
 APlayerController_TowerDefence::APlayerController_TowerDefence()
 {
@@ -92,14 +93,17 @@ void APlayerController_TowerDefence::HandelBuild(const FInputActionValue& Value)
 		params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		return params;
 		}();
-
-	// TODO List
-	//  어떤걸 생성할지
-	//  Grid 체크
-	FTransform targetTrans = FTransform{ FRotator::ZeroRotator, HitResult.Location, FVector::One() };
-	ATowerBase* pTower = GetWorld()->SpawnActorDeferred<ATowerBase>(
-		ATowerBase::StaticClass(), targetTrans
-	);
-	pTower->SetTowerAsset(ArrayTowerAssets[0]);
-	UGameplayStatics::FinishSpawningActor(pTower, targetTrans);
+	if (auto pGrid = Cast<AGrid>(HitResult.GetActor()))
+	{
+		FVector vResultPos;
+		if (pGrid->AbleToBuild(HitResult.Location, vResultPos))
+		{
+			FTransform targetTrans = FTransform{ FRotator::ZeroRotator, vResultPos, FVector::One() };
+			ATowerBase* pTower = GetWorld()->SpawnActorDeferred<ATowerBase>(
+				ATowerBase::StaticClass(), targetTrans
+			);
+			pTower->SetTowerAsset(ArrayTowerAssets[0]);
+			UGameplayStatics::FinishSpawningActor(pTower, targetTrans);
+		}
+	}
 }

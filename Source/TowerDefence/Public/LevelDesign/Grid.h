@@ -37,6 +37,8 @@ protected:
 	int32 m_iNumCol;
 
 	UPROPERTY(VisibleDefaultsOnly)
+	TObjectPtr<class UBoxComponent>								m_GridBody;
+	UPROPERTY(VisibleDefaultsOnly)
 	TMap<EGridType, TObjectPtr<UInstancedStaticMeshComponent>>	m_mapInsMeshComp;
 
 	// Editor에서 직접 수정 불가능
