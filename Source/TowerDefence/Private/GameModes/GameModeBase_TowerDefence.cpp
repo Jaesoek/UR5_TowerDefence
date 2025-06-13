@@ -15,7 +15,10 @@ void AGameModeBase_TowerDefence::StartPlay()
 
 	CachedGameState = Cast<AGameState_TowerDefence>(GetWorld()->GetGameState());
 
-    //StartRound_Waiting();
+	// Regist spawning monster logic in "GameState"
+	CachedGameState->RegistEvent_StartRound(this, &ThisClass::StartSpawnMonster);
+
+	StartRound_Waiting();	// Start waiting
 }
 
 void AGameModeBase_TowerDefence::StartRound_Waiting()
@@ -36,12 +39,12 @@ void AGameModeBase_TowerDefence::StartRound_Waiting()
 
 void AGameModeBase_TowerDefence::StartRound_InProgress()
 {
-    if (IsValid(CachedGameState))
+	if (IsValid(CachedGameState))
     {
         CachedGameState->SetGameState(ERoundState::Round_InProgress);
 
 
-    }
+	}
 
     GetWorldTimerManager().SetTimer(
         Timers.FindOrAdd("InProgress"),
@@ -54,25 +57,28 @@ void AGameModeBase_TowerDefence::StartRound_InProgress()
 
 void AGameModeBase_TowerDefence::StartRound_Finished()
 {
-    if (IsValid(CachedGameState))
+	if (IsValid(CachedGameState))
     {
         CachedGameState->SetGameState(ERoundState::Round_Finished);
     }
 
-    GetWorldTimerManager().SetTimer(
+	/*
+	* Temporary hiding
+	GetWorldTimerManager().SetTimer(
         Timers.FindOrAdd("Finished"),
         this,
         &ThisClass::StartRound_Waiting,
         FinishedTime,
         false
     );
+	*/
 }
 
 void AGameModeBase_TowerDefence::StartSpawnMonster()
 {
-    if (!IsValid(CachedGameState))
+	if (!IsValid(CachedGameState))
     {
-        return;
+		return;
     }
 
     if (!StageAsset.IsValid())
@@ -81,9 +87,9 @@ void AGameModeBase_TowerDefence::StartSpawnMonster()
     }
 
     if (!StageAsset.IsValid() || !StageAsset.Get()->StageWaveInfos.IsValidIndex(CachedGameState->GetCurrentLevel()))
-    {
-        return;
-    }
+	{
+		return;
+	}
  
     FStageWaveInfo StageWaveInfo = StageAsset.Get()->StageWaveInfos[CachedGameState->GetCurrentLevel()];
     if (StageWaveInfo.SpawnInterval > 0.f)
@@ -95,12 +101,12 @@ void AGameModeBase_TowerDefence::StartSpawnMonster()
             StageWaveInfo.SpawnInterval,
             true
         );
-    }    
+    }
 }
 
 void AGameModeBase_TowerDefence::OnSpawnMonster()
 {
-    if (!IsValid(CachedGameState))
+	if (!IsValid(CachedGameState))
     {
         return;
     }
@@ -111,7 +117,7 @@ void AGameModeBase_TowerDefence::OnSpawnMonster()
         StageWaveInfo.MonsterAsset.LoadSynchronous();
     }
 
-    if (!StageWaveInfo.MonsterAsset.IsValid() && IsValid(StageWaveInfo.MonsterAsset.Get()->MonsterClass))
+    if (StageWaveInfo.MonsterAsset.IsValid() && IsValid(StageWaveInfo.MonsterAsset.Get()->MonsterClass))
     {
 		if (Grid.IsValid())
 		{
@@ -119,7 +125,9 @@ void AGameModeBase_TowerDefence::OnSpawnMonster()
 			Grid->GetSpawnTransform(spawnTrans);
 
 			auto&& pMonster = GetWorld()->SpawnActorDeferred<AMonsterBase_TowerDefence>(
-				StageWaveInfo.MonsterAsset.Get()->MonsterClass, spawnTrans);
+				StageWaveInfo.MonsterAsset.Get()->MonsterClass, spawnTrans, nullptr, nullptr,
+				ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn
+			);
 			pMonster->SetupAsset(StageWaveInfo.MonsterAsset.Get());
 			UGameplayStatics::FinishSpawningActor(pMonster, spawnTrans);
 		}

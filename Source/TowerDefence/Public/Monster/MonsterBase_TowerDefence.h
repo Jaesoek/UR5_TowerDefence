@@ -18,12 +18,8 @@ public:
 
 	virtual void SetupAsset(const UMonsterAsset* InMonsterAsset);
 
-	FORCEINLINE TObjectPtr<UMonsterAsset> GetMonsterAsset() const { return MonsterAsset; }
 protected:
 	virtual void Destroyed() override;
-
-	UPROPERTY(Transient)
-	TObjectPtr<UMonsterAsset> MonsterAsset;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;

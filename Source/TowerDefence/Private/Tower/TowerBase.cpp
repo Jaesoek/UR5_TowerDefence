@@ -12,26 +12,30 @@ ATowerBase::ATowerBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	UCapsuleComponent* pRoot = CreateDefaultSubobject<UCapsuleComponent>(TEXT("RootComp"));
-	if (pRoot)
+	const float fHalfHeight = 50.f;	// Only for init
+
+	UCapsuleComponent* pCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("RootComp"));
+	if (pCapsule)
 	{
-		pRoot->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		pRoot->SetCollisionObjectType(ECC_Pawn);
-		pRoot->SetCollisionResponseToAllChannels(ECR_Block);
-		pRoot->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
-		pRoot->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+		pCapsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		pCapsule->SetCollisionObjectType(ECC_Pawn);
+		pCapsule->SetCollisionResponseToAllChannels(ECR_Block);
+		pCapsule->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
+		pCapsule->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
-		pRoot->InitCapsuleSize(30.f, 50.f);
-		pRoot->SetMobility(EComponentMobility::Movable);
-		pRoot->SetSimulatePhysics(false);
+		pCapsule->InitCapsuleSize(30.f, fHalfHeight);
+		pCapsule->SetRelativeLocation(FVector(0.f, 0.f, fHalfHeight));
+		pCapsule->SetMobility(EComponentMobility::Movable);
+		pCapsule->SetSimulatePhysics(false);
 
-		RootComponent = pRoot;
+		RootComponent = pCapsule;
 	}
 
 	m_SKMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 	if (m_SKMesh)
 	{
 		m_SKMesh->SetupAttachment(RootComponent);
+		m_SKMesh->SetRelativeLocation(FVector(0.f, 0.f, -fHalfHeight));
 	}
 
 	m_pAttackRange = CreateDefaultSubobject<USphereComponent>(TEXT("DetectionSphere"));

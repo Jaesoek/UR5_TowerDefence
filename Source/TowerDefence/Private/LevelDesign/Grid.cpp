@@ -75,6 +75,7 @@ void AGrid::InitGrid()
 				if (curGridType == EGridType::GRID_SPAWN)
 				{
 					m_vSpawnPos = Location;
+					m_vSpawnPos[2] = 100.0;
 				}
 
 				FTransform Transform(FRotator::ZeroRotator, Location, { CellHeight / 100.f, CellWidth / 100.f, 1.f });
@@ -116,7 +117,8 @@ bool AGrid::AbleToBuild(const FVector& vInputPos, FVector& vBuildPos) const
 	if (EGridType::GRID_BUILDABLE == m_cellTypes[iRow * m_iNumCol + iCol])
 	{
 		vBuildPos = GetActorLocation() - OriginOffset + CellOffset;
-		vBuildPos += FVector{ CellWidth * iCol, CellHeight * iRow, 0.f };
+		vBuildPos += FVector{ CellWidth * iCol, CellHeight * iRow, 0.0 };
+		vBuildPos[2] = 100.0;
 		return true;
 	}
 

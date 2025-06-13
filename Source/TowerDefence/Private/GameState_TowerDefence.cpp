@@ -3,7 +3,7 @@
 #include "TimerManager.h"
 
 AGameState_TowerDefence::AGameState_TowerDefence()
-	: m_iCurLevel(0)
+	: m_iCurLevel(-1)
 	, m_curRoundState{ ERoundState::Default }
 	, m_iRemainNum_Monsters(0)
 	, m_fRoundWaitTime(2.f)
@@ -23,7 +23,7 @@ void AGameState_TowerDefence::SetGameState(ERoundState InRoundState)
 	if (false == HasAuthority())
 		return;
 
-	switch (m_curRoundState)	// Doing Job in GameState
+	switch (InRoundState)	// Doing Job in GameState
 	{
 		case ERoundState::Round_InProgress:
 			StartRound();

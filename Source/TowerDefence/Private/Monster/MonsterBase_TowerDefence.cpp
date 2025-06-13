@@ -2,16 +2,40 @@
 #include "../Public/GameState_TowerDefence.h"
 #include "Monster/MonsterAIController.h"
 #include "Monster/MonsterAsset.h"
+#include "Components/CapsuleComponent.h"
 
 AMonsterBase_TowerDefence::AMonsterBase_TowerDefence()
 {
 	PrimaryActorTick.bCanEverTick = false; // ���� �Ⱦ��� ��Ȱ��ȭ
-	
+
 	AIControllerClass = AMonsterAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
+	const float fHalfHeight = 50.f;	// Only for init
+
+	UCapsuleComponent* pCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("RootComp"));
+	if (IsValid(pCapsule))
+	{
+		pCapsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		pCapsule->SetCollisionObjectType(ECC_Pawn);
+		pCapsule->SetCollisionResponseToAllChannels(ECR_Block);
+		pCapsule->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
+		pCapsule->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+		pCapsule->InitCapsuleSize(30.f, fHalfHeight);
+		pCapsule->SetRelativeLocation(FVector(0.f, 0.f, fHalfHeight));
+		pCapsule->SetMobility(EComponentMobility::Movable);
+		pCapsule->SetSimulatePhysics(false);
+
+		RootComponent = pCapsule;
+	}
+
 	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
-	SkeletalMeshComponent->SetupAttachment(RootComponent);
+	if (IsValid(SkeletalMeshComponent))
+	{
+		SkeletalMeshComponent->SetupAttachment(RootComponent);
+		SkeletalMeshComponent->SetRelativeLocation(FVector{ 0.f, 0.f, -fHalfHeight });
+	}
 }
 
 void AMonsterBase_TowerDefence::SetupAsset(const UMonsterAsset* InMonsterAsset)

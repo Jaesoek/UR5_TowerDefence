@@ -88,11 +88,6 @@ void APlayerController_TowerDefence::HandelBuild(const FInputActionValue& Value)
 		return;
 	}
 
-	static const FActorSpawnParameters spawnParams = [] {
-		FActorSpawnParameters params;
-		params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-		return params;
-		}();
 	if (auto pGrid = Cast<AGrid>(HitResult.GetActor()))
 	{
 		FVector vResultPos;
@@ -100,7 +95,7 @@ void APlayerController_TowerDefence::HandelBuild(const FInputActionValue& Value)
 		{
 			FTransform targetTrans = FTransform{ FRotator::ZeroRotator, vResultPos, FVector::One() };
 			ATowerBase* pTower = GetWorld()->SpawnActorDeferred<ATowerBase>(
-				ATowerBase::StaticClass(), targetTrans
+				ATowerBase::StaticClass(), targetTrans, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn
 			);
 			pTower->SetTowerAsset(ArrayTowerAssets[0]);
 			UGameplayStatics::FinishSpawningActor(pTower, targetTrans);
