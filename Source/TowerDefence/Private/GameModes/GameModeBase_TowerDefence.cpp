@@ -4,7 +4,10 @@
 #include "GameModes/GameModeBase_TowerDefence.h"
 #include "GameState_TowerDefence.h"
 #include "Monster/MonsterAsset.h"
+#include "Monster/MonsterBase_TowerDefence.h"
 #include "Stage/StageAsset.h"
+#include "LevelDesign/Grid.h"			// For getting spawn position
+#include "Kismet/GameplayStatics.h"		// For deferred spawning
 
 void AGameModeBase_TowerDefence::StartPlay()
 {
@@ -110,6 +113,15 @@ void AGameModeBase_TowerDefence::OnSpawnMonster()
 
     if (!StageWaveInfo.MonsterAsset.IsValid() && IsValid(StageWaveInfo.MonsterAsset.Get()->MonsterClass))
     {
-        GetWorld()->SpawnActor(StageWaveInfo.MonsterAsset.Get()->MonsterClass);
-    }
+		if (Grid.IsValid())
+		{
+			FTransform spawnTrans;
+			Grid->GetSpawnTransform(spawnTrans);
+
+			auto&& pMonster = GetWorld()->SpawnActorDeferred<AMonsterBase_TowerDefence>(
+				StageWaveInfo.MonsterAsset.Get()->MonsterClass, spawnTrans);
+			pMonster->SetupAsset(StageWaveInfo.MonsterAsset.Get());
+			UGameplayStatics::FinishSpawningActor(pMonster, spawnTrans);
+		}
+	}
 }

@@ -27,6 +27,8 @@ protected:
 	virtual void OnConstruction(const FTransform& trans) override;
 	virtual void InitGrid();
 
+	virtual void BeginPlay() override;
+
 	UPROPERTY(EditAnywhere, Category = "Grid Setting", meta = (ClampMin = "10.0", UIMin = "10.0"))
 	float m_fWidth;
 	UPROPERTY(EditAnywhere, Category = "Grid Setting", meta = (ClampMin = "10.0", UIMin = "10.0"))
@@ -49,10 +51,15 @@ protected:
 	UPROPERTY(Transient)
 	TMap<int32, EGridType> m_Indices;	// For follow up datas
 
+	FVector m_vSpawnPos;	// For saving spawn position
+
 
 public:
 	UFUNCTION()
 	virtual bool AbleToBuild(const FVector& vInputPos, FVector& vBuildPos) const;
+
+	UFUNCTION()
+	virtual void GetSpawnTransform(FTransform& outTrans) const;
 
 	UFUNCTION()
 	virtual EGridType GetTileType(const FVector& vInputPos) const;

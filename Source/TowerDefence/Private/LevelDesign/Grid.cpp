@@ -4,6 +4,7 @@
 #include "LevelDesign/Grid.h"
 #include "Components/InstancedStaticMeshComponent.h"
 #include "Components/BoxComponent.h"
+#include "GameModes/GameModeBase_TowerDefence.h"
 
 #if WITH_EDITOR
 #include "Editor.h"
@@ -11,7 +12,7 @@
 
 
 AGrid::AGrid()
-	: m_fWidth(10.f), m_fHeight(10), m_iNumCol(2), m_iNumRow(2)
+	: m_fWidth(10.f), m_fHeight(10), m_iNumRow(2), m_iNumCol(2)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -71,10 +72,26 @@ void AGrid::InitGrid()
 				Location -= OriginOffset;
 				Location += CellOffset;
 
+				if (curGridType == EGridType::GRID_SPAWN)
+				{
+					m_vSpawnPos = Location;
+				}
+
 				FTransform Transform(FRotator::ZeroRotator, Location, { CellHeight / 100.f, CellWidth / 100.f, 1.f });
 				int32&& newIndex = m_mapInsMeshComp[curGridType]->AddInstance(Transform);
 			}
 		}
+	}
+}
+
+void AGrid::BeginPlay()
+{
+	Super::BeginPlay();
+
+	AGameModeBase_TowerDefence* GameMode = GetWorld()->GetAuthGameMode<AGameModeBase_TowerDefence>();
+	if (IsValid(GameMode))
+	{
+		GameMode->SetGrid(this);
 	}
 }
 
@@ -104,6 +121,15 @@ bool AGrid::AbleToBuild(const FVector& vInputPos, FVector& vBuildPos) const
 	}
 
 	return false;
+}
+
+void AGrid::GetSpawnTransform(FTransform& outTrans) const
+{
+	outTrans = FTransform{
+		FRotator::ZeroRotator,
+		m_vSpawnPos,
+		FVector::OneVector
+	};
 }
 
 EGridType AGrid::GetTileType(const FVector& vPos) const

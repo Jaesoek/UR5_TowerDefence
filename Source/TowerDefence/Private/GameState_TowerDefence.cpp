@@ -10,45 +10,25 @@ AGameState_TowerDefence::AGameState_TowerDefence()
 {
 }
 
-void AGameState_TowerDefence::WaitRound()
-{
-	if (false == HasAuthority())
-		return;
-
-	SetGameState(ERoundState::Round_Waiting);
-
-	FTimerHandle TimerHandle_StartRound;
-	GetWorld()->GetTimerManager().SetTimer(
-		TimerHandle_StartRound,
-		this,
-		&AGameState_TowerDefence::StartRound,
-		m_fRoundWaitTime,
-		false
-	);
-}
-
 void AGameState_TowerDefence::StartRound()
 {
 	if (false == HasAuthority())
 		return;
 
 	m_iCurLevel += 1;
-
-	SetGameState(ERoundState::Round_InProgress);
-}
-
-void AGameState_TowerDefence::EndGame()
-{
-	if (false == HasAuthority())
-		return;
-
-	SetGameState(ERoundState::Round_Finished);
 }
 
 void AGameState_TowerDefence::SetGameState(ERoundState InRoundState)
 {
 	if (false == HasAuthority())
 		return;
+
+	switch (m_curRoundState)	// Doing Job in GameState
+	{
+		case ERoundState::Round_InProgress:
+			StartRound();
+			break;
+	}
 
 	if (m_curRoundState != InRoundState)
 	{
@@ -78,6 +58,6 @@ void AGameState_TowerDefence::DecreaseMonster()
 
 	if (m_iRemainNum_Monsters == 0)
 	{
-		WaitRound();
+
 	}
 }

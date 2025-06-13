@@ -8,6 +8,7 @@
 
 class UStageAsset;
 class AGameState_TowerDefence;
+class AGrid;
 
 UCLASS()
 class TOWERDEFENCE_API AGameModeBase_TowerDefence : public AGameModeBase
@@ -25,6 +26,8 @@ public:
 
 	virtual void StartSpawnMonster();
 	virtual void OnSpawnMonster();
+
+	FORCEINLINE void SetGrid(TWeakObjectPtr<AGrid> pGrid) { Grid = pGrid; };
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -44,4 +47,7 @@ protected:
 
 	UPROPERTY(Transient)
 	TMap<FName, FTimerHandle> Timers;
+
+	UPROPERTY(Transient)
+	TWeakObjectPtr<AGrid> Grid;
 };

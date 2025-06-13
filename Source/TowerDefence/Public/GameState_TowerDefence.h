@@ -25,13 +25,14 @@ public:
 	virtual void SetGameState(ERoundState InRoundState);
 	FORCEINLINE virtual int32 GetCurrentLevel() { return m_iCurLevel; }
 
+	void SetMonsterNum(int32 iNumMonsters);	// For testing
+	void DecreaseMonster();
+
 protected:
 	// GameState Interface
 	// ~GameState Interface
 
-	virtual void WaitRound();
 	virtual void StartRound();
-	virtual void EndGame();
 
 	UPROPERTY(Transient)
 	int32 m_iCurLevel;
@@ -45,10 +46,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Round Rule Setting")
 	float m_fRoundWaitTime;
 
-public:
-	void SetMonsterNum(int32 iNumMonsters);
-	void DecreaseMonster();
-
 
 protected:
 	DECLARE_MULTICAST_DELEGATE(FOnStateChanged)
@@ -59,5 +56,11 @@ public:
 	void RegistEvent_StartRound(UserClass* InObject, typename TMemFunPtrType<false, UserClass, void()>::Type InFunc)
 	{
 		OnStateChangedEvent[(uint8)ERoundState::Round_InProgress].AddUObject(InObject, InFunc);
+	}
+
+	template <typename UserClass>
+	void RegistEvent_FinishRound(UserClass* InObject, typename TMemFunPtrType<false, UserClass, void()>::Type InFunc)
+	{
+		OnStateChangedEvent[(uint8)ERoundState::Round_Finished].AddUObject(InObject, InFunc);
 	}
 };

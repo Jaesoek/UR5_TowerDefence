@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Templates/SubclassOf.h"	// For forward declaration
 #include "Engine/DataAsset.h"
 #include "Types/CombatType.h"
 #include "MonsterAsset.generated.h"
