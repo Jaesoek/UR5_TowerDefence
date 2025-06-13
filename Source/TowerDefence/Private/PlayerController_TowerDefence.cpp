@@ -90,7 +90,7 @@ void APlayerController_TowerDefence::HandelBuild(const FInputActionValue& Value)
 
 	static const FActorSpawnParameters spawnParams = [] {
 		FActorSpawnParameters params;
-		params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		return params;
 		}();
 	if (auto pGrid = Cast<AGrid>(HitResult.GetActor()))
@@ -104,6 +104,11 @@ void APlayerController_TowerDefence::HandelBuild(const FInputActionValue& Value)
 			);
 			pTower->SetTowerAsset(ArrayTowerAssets[0]);
 			UGameplayStatics::FinishSpawningActor(pTower, targetTrans);
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red,
+				TEXT("Can't build in here"));
 		}
 	}
 }

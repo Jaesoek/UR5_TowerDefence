@@ -87,7 +87,6 @@ bool AGrid::AbleToBuild(const FVector& vInputPos, FVector& vBuildPos) const
 	
 	if (vPos.X < 0 || vPos.Y < 0 || vPos.X >= m_fWidth || vPos.Y >= m_fHeight)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Grid OFF 1"));
 		return false;
 	}
 
@@ -104,8 +103,6 @@ bool AGrid::AbleToBuild(const FVector& vInputPos, FVector& vBuildPos) const
 		return true;
 	}
 
-
-	UE_LOG(LogTemp, Display, TEXT("Grid OFF 2"));
 	return false;
 }
 

@@ -4,12 +4,29 @@
 #include "Tower/TowerBase.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "Monster/MonsterBase_TowerDefence.h"
 
 ATowerBase::ATowerBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	UCapsuleComponent* pRoot = CreateDefaultSubobject<UCapsuleComponent>(TEXT("RootComp"));
+	if (pRoot)
+	{
+		pRoot->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		pRoot->SetCollisionObjectType(ECC_Pawn);
+		pRoot->SetCollisionResponseToAllChannels(ECR_Block);
+		pRoot->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
+		pRoot->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+		pRoot->InitCapsuleSize(30.f, 50.f);
+		pRoot->SetMobility(EComponentMobility::Movable);
+		pRoot->SetSimulatePhysics(false);
+
+		RootComponent = pRoot;
+	}
 
 	m_SKMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 	if (m_SKMesh)
@@ -38,6 +55,8 @@ void ATowerBase::PostInitializeComponents()
 		}
 		m_SKMesh->SetSkeletalMeshAsset(m_TowerAsset->TowerMesh.Get());
 		m_SKMesh->SetAnimInstanceClass(m_TowerAsset->AnimInstance);
+
+		m_pAttackRange->SetSphereRadius(m_TowerAsset->AttackRange);
 	}
 }
 
@@ -109,4 +128,13 @@ void ATowerBase::SetCurTarget(AActor* pActor)
 			m_pCurTarget = *iter;
 		}
 	}
+}
+
+void ATowerBase::OnFocused()
+{
+	// TODO: Render Range 
+}
+
+void ATowerBase::OnMoveTo(const FVector& vTargetPos)
+{
 }

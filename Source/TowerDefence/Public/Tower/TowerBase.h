@@ -4,11 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "../ControlUnit.h"
 #include "Tower/TowerAsset.h"
 #include "TowerBase.generated.h"
 
 UCLASS()
-class TOWERDEFENCE_API ATowerBase : public APawn
+class TOWERDEFENCE_API ATowerBase : public APawn, public IControlUnit
 {
 	GENERATED_BODY()
 
@@ -47,4 +48,7 @@ public:
 
 private:
 	void SetCurTarget(AActor* pActor = nullptr);
+
+	virtual void OnFocused() override;
+	virtual void OnMoveTo(const FVector& vTargetPos) override;
 };
