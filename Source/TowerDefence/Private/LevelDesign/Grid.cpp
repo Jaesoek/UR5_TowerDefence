@@ -4,6 +4,8 @@
 #include "LevelDesign/Grid.h"
 #include "Components/InstancedStaticMeshComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/SplineComponent.h"
+#include "Components/SplineComponent.h"
 #include "GameModes/GameModeBase_TowerDefence.h"
 
 #if WITH_EDITOR
@@ -41,6 +43,17 @@ void AGrid::OnConstruction(const FTransform& trans)
 	InitGrid();
 }
 
+void AGrid::BeginPlay()
+{
+	Super::BeginPlay();
+
+	AGameModeBase_TowerDefence* GameMode = GetWorld()->GetAuthGameMode<AGameModeBase_TowerDefence>();
+	if (IsValid(GameMode))
+	{
+		GameMode->SetGrid(this);
+	}
+}
+
 void AGrid::InitGrid()
 {
 	FVector NewExtent(m_fWidth / 2, m_fHeight / 2, 100.f);
@@ -74,6 +87,8 @@ void AGrid::InitGrid()
 
 				if (curGridType == EGridType::GRID_SPAWN)
 				{
+					m_iSpawnIndex = Row * m_iNumCol + Col;
+
 					m_vSpawnPos = Location;
 					m_vSpawnPos[2] = 100.0;
 				}
@@ -85,15 +100,58 @@ void AGrid::InitGrid()
 	}
 }
 
-void AGrid::BeginPlay()
+void AGrid::InitPath(std::vector<bool>& vecDidVisited, int32 StartIndex, int32 GoalIndex)
 {
-	Super::BeginPlay();
+	/**
+	* Path block 기반 Spline 생성
 
-	AGameModeBase_TowerDefence* GameMode = GetWorld()->GetAuthGameMode<AGameModeBase_TowerDefence>();
-	if (IsValid(GameMode))
+	TSet<FGridCoord> Visited;
+	TArray<int32> OrderedIndices;
+
+	FGridCoord Start = GetCoord(StartIndex);
+	FGridCoord Goal = GetCoord(GoalIndex);
+
+	PathSpline->AddPoint(FSplinePoint{Start});
+	Visited.Add(Start);
+
+	// 우, 하, 상, 좌 순서
+	const TArray<FGridCoord> Directions = {
+		{ 1, 0 },  // Right
+		{ 0, 1 },  // Down
+		{ 0, -1 }, // Up
+		{ -1, 0 }  // Left
+	};
+
+	// DFS 스택 기반 루프
+	TArray<FGridCoord> Stack;
+	Stack.Add(Start);
+
+	while (Stack.Num() > 0)
 	{
-		GameMode->SetGrid(this);
+		FGridCoord Current = Stack.Pop();
+
+		for (const FGridCoord& Dir : Directions)
+		{
+			FGridCoord Next = { Current.X + Dir.X, Current.Y + Dir.Y };
+
+			if (!IsValidCoord(Next.X, Next.Y) || Visited.Contains(Next))
+				continue;
+
+			int32 NextIdx = GetIndex(Next.X, Next.Y);
+
+			if (Grid[NextIdx] == EGridType::Path)
+			{
+				Visited.Add(Next);
+				OrderedIndices.Add(NextIdx);
+				Stack.Add(Next); // 다음 탐색 위치
+				break; // ✅ 방향 우선 순서 유지: 한 방향만 탐색 후 다시 루프 시작
+			}
+		}
 	}
+
+	// 마지막 Goal 추가
+	OrderedIndices.Add(GoalIndex);
+	*/
 }
 
 bool AGrid::AbleToBuild(const FVector& vInputPos, FVector& vBuildPos) const

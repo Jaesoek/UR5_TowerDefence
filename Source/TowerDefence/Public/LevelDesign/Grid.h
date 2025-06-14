@@ -20,14 +20,21 @@ class TOWERDEFENCE_API AGrid : public AActor
 
 friend class FDetailGrid;
 
+struct FGridCoord
+{
+	int32 iRow, iCol;
+	bool operator==(const FGridCoord& Other) const { return iCol == Other.iCol && iRow == Other.iRow; }
+};
+
 public:	
 	AGrid();
 
 protected:
 	virtual void OnConstruction(const FTransform& trans) override;
-	virtual void InitGrid();
-
 	virtual void BeginPlay() override;
+
+	virtual void InitGrid();
+	virtual void InitPath(std::vector<bool>& vecDidVisited, int32 curRow, int32 curCol);
 
 	UPROPERTY(EditAnywhere, Category = "Grid Setting", meta = (ClampMin = "10.0", UIMin = "10.0"))
 	float m_fWidth;
@@ -39,19 +46,23 @@ protected:
 	int32 m_iNumCol;
 
 	UPROPERTY(VisibleDefaultsOnly)
-	TObjectPtr<class UBoxComponent>								m_GridBody;
-	UPROPERTY(VisibleDefaultsOnly)
 	TMap<EGridType, TObjectPtr<UInstancedStaticMeshComponent>>	m_mapInsMeshComp;
 
+
 	// Editor에서 직접 수정 불가능
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY()
+	TObjectPtr<class UBoxComponent>		m_GridBody;
+
+	UPROPERTY()
 	TArray<EGridType> m_cellTypes;
-	//~ Editor에서 직접 수정 불가능
+	// TODO: Cell 정보 Transform이랑 같이 넣을 것
 
 	UPROPERTY(Transient)
-	TMap<int32, EGridType> m_Indices;	// For follow up datas
+	TObjectPtr<class USplineComponent>	PathSpline;	// Path for monsters
 
-	FVector m_vSpawnPos;	// For saving spawn position
+	FVector m_vSpawnPos;	// For saving spawn pos data
+	int32 m_iSpawnIndex;
+	//~ Editor에서 직접 수정 불가능
 
 
 public:
@@ -70,4 +81,15 @@ public:
 #endif
 
 
+private:
+	int32 GetIndex(int32 iRow, int32 iCol) const {
+		return iRow * m_iNumCol + iCol;
+	};
+	FGridCoord GetCoord(int32 iIndex) const {
+		return { iIndex / m_iNumCol, iIndex % m_iNumCol};
+	};
+	bool IsValidCoord(int32 iRow, int32 iCol) const
+	{
+		return iRow >= 0 && iCol >= 0 && iRow < m_iNumRow && iCol < m_iNumCol;
+	}
 };
