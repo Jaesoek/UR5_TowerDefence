@@ -40,7 +40,7 @@ void FDetailGrid::CustomizeDetails(IDetailLayoutBuilder& DetailBuilder)
 	IDetailCategoryBuilder& GridCategory = DetailBuilder.EditCategory("Grid", FText::FromString(TEXT("Grid")));
 
 	auto pGrid = GridInfo.Get();
-	for (int32 Row = 0; Row < pGrid->m_iNumRow; ++Row)
+	for (int32 Row = pGrid->m_iNumRow - 1; Row >= 0; --Row)
 	{
 		TSharedRef<SHorizontalBox> RowBox = SNew(SHorizontalBox);
 		for (int32 Col = 0; Col < pGrid->m_iNumCol; ++Col)

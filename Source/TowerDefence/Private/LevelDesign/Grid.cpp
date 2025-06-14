@@ -66,36 +66,35 @@ void AGrid::InitGrid()
 
 	float CellWidth = m_fWidth / m_iNumCol;
 	float CellHeight = m_fHeight / m_iNumRow;
-	FVector OriginOffset = FVector(m_fWidth * 0.5f, m_fHeight * 0.5f, 0.f);
-	FVector CellOffset = FVector(CellWidth * 0.5f, CellHeight * 0.5f, 0.f);
+	FVector OriginOffset = FVector(m_fHeight * 0.5f, m_fWidth * 0.5f, 0.f);
+	FVector CellOffset = FVector(CellHeight * 0.5f, CellWidth * 0.5f, 0.f);
 
-	for (int32 Row = 0; Row < m_iNumRow; ++Row)
+	for (int32 iIndex = 0; iIndex < m_iNumCol * m_iNumRow; ++iIndex)
 	{
-		for (int32 Col = 0; Col < m_iNumCol; ++Col)
+		if (m_cellTypes.Num() <= iIndex)
 		{
-			if (m_cellTypes.Num() <= Row * m_iNumCol + Col)
-			{
-				m_cellTypes.Add(EGridType::GRID_NULL);
-			}
+			m_cellTypes.Add(EGridType::GRID_NULL);
+		}
 
-			const EGridType& curGridType = m_cellTypes[Row * m_iNumCol + Col];
-			if (IsValid(m_mapInsMeshComp[curGridType]))
-			{
-				FVector Location = FVector(CellWidth * Col, CellHeight * Row, 0.f);
-				Location -= OriginOffset;
-				Location += CellOffset;
+		FGridCoord gridCoord = GetCoord(iIndex);
 
-				if (curGridType == EGridType::GRID_SPAWN)
-				{
-					m_iSpawnIndex = Row * m_iNumCol + Col;
+		FVector Location = FVector(CellHeight * gridCoord.iRow, CellWidth * gridCoord.iCol, 0.f);
+		Location -= OriginOffset;
+		Location += CellOffset;
 
-					m_vSpawnPos = Location;
-					m_vSpawnPos[2] = 100.0;
-				}
+		const EGridType& curGridType = m_cellTypes[iIndex];
+		if (curGridType == EGridType::GRID_SPAWN)
+		{
+			m_vSpawnPos = Location + GetActorLocation();
+			m_vSpawnPos[2] = 100.0;
 
-				FTransform Transform(FRotator::ZeroRotator, Location, { CellHeight / 100.f, CellWidth / 100.f, 1.f });
-				int32&& newIndex = m_mapInsMeshComp[curGridType]->AddInstance(Transform);
-			}
+			m_iSpawnIndex = iIndex;
+		}
+
+		if (IsValid(m_mapInsMeshComp[curGridType]))
+		{
+			FTransform Transform(FRotator::ZeroRotator, Location, { CellHeight / 100.f, CellWidth / 100.f, 1.f });
+			int32&& newIndex = m_mapInsMeshComp[curGridType]->AddInstance(Transform);
 		}
 	}
 }
@@ -156,26 +155,26 @@ void AGrid::InitPath(std::vector<bool>& vecDidVisited, int32 StartIndex, int32 G
 
 bool AGrid::AbleToBuild(const FVector& vInputPos, FVector& vBuildPos) const
 {
-	FVector OriginOffset = FVector(m_fWidth * 0.5f, m_fHeight * 0.5f, 0.f);
+	FVector OriginOffset = FVector(m_fHeight * 0.5f, m_fWidth * 0.5f, 0.f);
 
 	FVector vPos = vInputPos - GetActorLocation();
 	vPos += OriginOffset;
 	
-	if (vPos.X < 0 || vPos.Y < 0 || vPos.X >= m_fWidth || vPos.Y >= m_fHeight)
+	if (vPos.X < 0 || vPos.Y < 0 || vPos.X >= m_fHeight || vPos.Y >= m_fWidth)
 	{
 		return false;
 	}
 
 	float CellWidth = m_fWidth / m_iNumCol;
 	float CellHeight = m_fHeight / m_iNumRow;
-	FVector CellOffset = FVector(CellWidth * 0.5f, CellHeight * 0.5f, 0.f);
+	FVector CellOffset = FVector(CellHeight * 0.5f, CellWidth * 0.5f, 0.f);
 
-	int iCol = static_cast<int>(vPos.X / CellWidth);
-	int iRow = static_cast<int>(vPos.Y / CellHeight);
-	if (EGridType::GRID_BUILDABLE == m_cellTypes[iRow * m_iNumCol + iCol])
+	int iCol = static_cast<int>(vPos.Y / CellWidth);
+	int iRow = static_cast<int>(vPos.X / CellHeight);
+	if (EGridType::GRID_BUILDABLE == m_cellTypes[GetIndex(iRow, iCol)])
 	{
 		vBuildPos = GetActorLocation() - OriginOffset + CellOffset;
-		vBuildPos += FVector{ CellWidth * iCol, CellHeight * iRow, 0.0 };
+		vBuildPos += FVector{ CellHeight * iRow, CellWidth * iCol, 0.0 };
 		vBuildPos[2] = 100.0;
 		return true;
 	}
@@ -199,12 +198,12 @@ EGridType AGrid::GetTileType(const FVector& vPos) const
 	float fCellWidth = m_fWidth / m_iNumCol;
 	float fCellHeight = m_fHeight / m_iNumRow;
 
-	int32 col = FMath::FloorToInt(vLocal.X / fCellWidth);
-	int32 row = FMath::FloorToInt(vLocal.Y / fCellHeight);
+	int32 col = FMath::FloorToInt(vLocal.Y / fCellWidth);
+	int32 row = FMath::FloorToInt(vLocal.X / fCellHeight);
 
 	if (row >= 0 && row < m_iNumRow && col >= 0 && col < m_iNumCol)
 	{
-		return m_cellTypes[row * m_iNumCol + col];
+		return m_cellTypes[GetIndex(row, col)];
 	}
 	return EGridType::GRID_NULL;
 }
