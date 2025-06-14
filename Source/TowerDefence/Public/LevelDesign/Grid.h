@@ -60,8 +60,17 @@ protected:
 	UPROPERTY(Transient)
 	TObjectPtr<class USplineComponent>	PathSpline;	// Path for monsters
 
+	UPROPERTY(Transient)
 	FVector m_vSpawnPos;	// For saving spawn pos data
+
+	UPROPERTY(Transient)
 	int32 m_iSpawnIndex;
+
+	UPROPERTY(Transient)
+	FVector m_vGoalPos;	// For saving spawn pos data
+
+	UPROPERTY(Transient)
+	int32 m_iGoalIndex;
 	//~ Editor에서 직접 수정 불가능
 
 
@@ -70,7 +79,10 @@ public:
 	virtual bool AbleToBuild(const FVector& vInputPos, FVector& vBuildPos) const;
 
 	UFUNCTION()
-	virtual void GetSpawnTransform(FTransform& outTrans) const;
+	virtual bool GetSpawnTransform(FTransform& outTrans) const;
+
+	UFUNCTION()
+	virtual bool GetGoalTransform(FTransform& outTrans) const;
 
 	UFUNCTION()
 	virtual EGridType GetTileType(const FVector& vInputPos) const;

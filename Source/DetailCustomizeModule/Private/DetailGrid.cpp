@@ -105,8 +105,23 @@ FReply FDetailGrid::OnCellClicked(int32 Index)
 	if (!GridInfo->m_cellTypes.IsValidIndex(Index))
 		return FReply::Handled();
 
-	EGridType& Type = GridInfo->m_cellTypes[Index];
-	Type = static_cast<EGridType>((static_cast<uint8>(Type) + 1) % 4);
+	EGridType tempType = static_cast<EGridType>(
+		(static_cast<uint8>(GridInfo->m_cellTypes[Index]) + 1) % 5);
+	if (tempType == EGridType::GRID_SPAWN)
+	{
+		if (GridInfo->m_iSpawnIndex != -1)
+		{
+			tempType = EGridType::GRID_PATH;
+		}
+	}
+	else if (tempType == EGridType::GRID_GOAL)
+	{
+		if (GridInfo->m_iGoalIndex != -1)
+		{
+			tempType = EGridType::GRID_NULL;
+		}
+	}
+	GridInfo->m_cellTypes[Index] = tempType;
 
 	// 적용
 	if (GridInfo.IsValid())

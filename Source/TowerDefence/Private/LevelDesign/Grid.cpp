@@ -15,6 +15,7 @@
 
 AGrid::AGrid()
 	: m_fWidth(10.f), m_fHeight(10), m_iNumRow(2), m_iNumCol(2)
+	, m_iSpawnIndex(-1), m_iGoalIndex(-1)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -69,6 +70,7 @@ void AGrid::InitGrid()
 	FVector OriginOffset = FVector(m_fHeight * 0.5f, m_fWidth * 0.5f, 0.f);
 	FVector CellOffset = FVector(CellHeight * 0.5f, CellWidth * 0.5f, 0.f);
 
+	bool isSpawnSet = false, isGoalSet = false;
 	for (int32 iIndex = 0; iIndex < m_iNumCol * m_iNumRow; ++iIndex)
 	{
 		if (m_cellTypes.Num() <= iIndex)
@@ -85,10 +87,21 @@ void AGrid::InitGrid()
 		const EGridType& curGridType = m_cellTypes[iIndex];
 		if (curGridType == EGridType::GRID_SPAWN)
 		{
+			isSpawnSet = true;
+
 			m_vSpawnPos = Location + GetActorLocation();
 			m_vSpawnPos[2] = 100.0;
 
 			m_iSpawnIndex = iIndex;
+		}
+		else if (curGridType == EGridType::GRID_GOAL)
+		{
+			isGoalSet = true;
+
+			m_vGoalPos = Location + GetActorLocation();
+			m_vGoalPos[2] = 100.0;
+
+			m_iGoalIndex = iIndex;
 		}
 
 		if (IsValid(m_mapInsMeshComp[curGridType]))
@@ -96,6 +109,15 @@ void AGrid::InitGrid()
 			FTransform Transform(FRotator::ZeroRotator, Location, { CellHeight / 100.f, CellWidth / 100.f, 1.f });
 			int32&& newIndex = m_mapInsMeshComp[curGridType]->AddInstance(Transform);
 		}
+	}
+
+	if (false == isSpawnSet)
+	{
+		m_iSpawnIndex = -1;
+	}
+	if (false == isGoalSet)
+	{
+		m_iGoalIndex = -1;
 	}
 }
 
@@ -182,13 +204,30 @@ bool AGrid::AbleToBuild(const FVector& vInputPos, FVector& vBuildPos) const
 	return false;
 }
 
-void AGrid::GetSpawnTransform(FTransform& outTrans) const
+bool AGrid::GetSpawnTransform(FTransform& outTrans) const
 {
+	if (m_iSpawnIndex == -1)
+		return false;
+
 	outTrans = FTransform{
 		FRotator::ZeroRotator,
 		m_vSpawnPos,
 		FVector::OneVector
 	};
+	return true;
+}
+
+bool AGrid::GetGoalTransform(FTransform& outTrans) const
+{
+	if (m_iGoalIndex == -1)
+		return false;
+
+	outTrans = FTransform{
+		FRotator::ZeroRotator,
+		m_vGoalPos,
+		FVector::OneVector
+	};
+	return true;
 }
 
 EGridType AGrid::GetTileType(const FVector& vPos) const
