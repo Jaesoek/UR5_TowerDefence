@@ -119,10 +119,9 @@ void AGameModeBase_TowerDefence::OnSpawnMonster()
 
     if (StageWaveInfo.MonsterAsset.IsValid() && IsValid(StageWaveInfo.MonsterAsset.Get()->MonsterClass))
     {
-		if (Grid.IsValid())
+		if (Grid.IsValid() && Grid->IsSpawnSet())
 		{
-			FTransform spawnTrans;
-			Grid->GetSpawnTransform(spawnTrans);
+			FTransform spawnTrans = Grid->GetSpawnTransform();
 
 			auto&& pMonster = GetWorld()->SpawnActorDeferred<AMonsterBase_TowerDefence>(
 				StageWaveInfo.MonsterAsset.Get()->MonsterClass, spawnTrans, nullptr, nullptr,

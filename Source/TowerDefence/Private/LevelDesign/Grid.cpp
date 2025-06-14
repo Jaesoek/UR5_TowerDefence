@@ -204,32 +204,6 @@ bool AGrid::AbleToBuild(const FVector& vInputPos, FVector& vBuildPos) const
 	return false;
 }
 
-bool AGrid::GetSpawnTransform(FTransform& outTrans) const
-{
-	if (m_iSpawnIndex == -1)
-		return false;
-
-	outTrans = FTransform{
-		FRotator::ZeroRotator,
-		m_vSpawnPos,
-		FVector::OneVector
-	};
-	return true;
-}
-
-bool AGrid::GetGoalTransform(FTransform& outTrans) const
-{
-	if (m_iGoalIndex == -1)
-		return false;
-
-	outTrans = FTransform{
-		FRotator::ZeroRotator,
-		m_vGoalPos,
-		FVector::OneVector
-	};
-	return true;
-}
-
 EGridType AGrid::GetTileType(const FVector& vPos) const
 {
 	FVector vLocal = vPos - GetActorLocation();

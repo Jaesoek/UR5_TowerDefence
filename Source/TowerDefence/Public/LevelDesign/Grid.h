@@ -50,24 +50,23 @@ protected:
 
 
 	// Editor에서 직접 수정 불가능
-	UPROPERTY()
-	TObjectPtr<class UBoxComponent>		m_GridBody;
+	UPROPERTY(VisibleDefaultsOnly)
+	TObjectPtr<class UBoxComponent>	m_GridBody;
 
-	UPROPERTY()
+	UPROPERTY(VisibleDefaultsOnly)
 	TArray<EGridType> m_cellTypes;
-	// TODO: Cell 정보 Transform이랑 같이 넣을 것
 
 	UPROPERTY(Transient)
 	TObjectPtr<class USplineComponent>	PathSpline;	// Path for monsters
 
 	UPROPERTY(Transient)
-	FVector m_vSpawnPos;	// For saving spawn pos data
+	FVector m_vSpawnPos;
 
 	UPROPERTY(Transient)
 	int32 m_iSpawnIndex;
 
 	UPROPERTY(Transient)
-	FVector m_vGoalPos;	// For saving spawn pos data
+	FVector m_vGoalPos;
 
 	UPROPERTY(Transient)
 	int32 m_iGoalIndex;
@@ -78,11 +77,32 @@ public:
 	UFUNCTION()
 	virtual bool AbleToBuild(const FVector& vInputPos, FVector& vBuildPos) const;
 
-	UFUNCTION()
-	virtual bool GetSpawnTransform(FTransform& outTrans) const;
 
-	UFUNCTION()
-	virtual bool GetGoalTransform(FTransform& outTrans) const;
+	FORCEINLINE bool IsSpawnSet() const
+	{
+		return m_iSpawnIndex != -1;
+	}
+	FORCEINLINE FTransform GetSpawnTransform() const
+	{
+		return FTransform{
+			FRotator::ZeroRotator,
+			m_vSpawnPos,
+			FVector::OneVector
+		};
+	};
+
+	FORCEINLINE bool IsGoalSet() const
+	{
+		return m_iGoalIndex != -1;
+	}
+	FORCEINLINE FTransform GetGoalTransform() const
+	{
+		return FTransform{
+			FRotator::ZeroRotator,
+			m_vGoalPos,
+			FVector::OneVector
+		};
+	}
 
 	UFUNCTION()
 	virtual EGridType GetTileType(const FVector& vInputPos) const;
