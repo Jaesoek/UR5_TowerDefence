@@ -13,6 +13,20 @@ enum class EGridType : uint8
 	GRID_NULL, GRID_SPAWN, GRID_PATH, GRID_BUILDABLE, GRID_GOAL
 };
 
+USTRUCT()
+struct FGridCellInfo
+{
+	GENERATED_BODY()
+
+	FGridCellInfo()
+		: typeCell(EGridType::GRID_NULL), vPosRelative({ 0.0, 0.0, 0.0 })
+	{
+	}
+
+	EGridType typeCell;
+	FVector	vPosRelative;
+};
+
 UCLASS()
 class TOWERDEFENCE_API AGrid : public AActor
 {
@@ -34,7 +48,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void InitGrid();
-	virtual void InitPath(std::vector<bool>& vecDidVisited, int32 curRow, int32 curCol);
+	virtual void InitPath();
 
 	UPROPERTY(EditAnywhere, Category = "Grid Setting", meta = (ClampMin = "10.0", UIMin = "10.0"))
 	float m_fWidth;
@@ -54,10 +68,10 @@ protected:
 	TObjectPtr<class UBoxComponent>	m_GridBody;
 
 	UPROPERTY(VisibleDefaultsOnly)
-	TArray<EGridType> m_cellTypes;
+	TArray<FGridCellInfo> m_arrCell;
 
 	UPROPERTY(Transient)
-	TObjectPtr<class USplineComponent>	PathSpline;	// Path for monsters
+	TObjectPtr<class USplineComponent>	SplinePath;	// Path for monsters
 
 	UPROPERTY(Transient)
 	FVector m_vSpawnPos;

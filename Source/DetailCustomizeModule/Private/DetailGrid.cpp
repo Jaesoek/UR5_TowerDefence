@@ -73,10 +73,10 @@ void FDetailGrid::CustomizeDetails(IDetailLayoutBuilder& DetailBuilder)
 
 FSlateColor FDetailGrid::GetCellColor(int32 Index) const
 {
-	if (!GridInfo->m_cellTypes.IsValidIndex(Index))
+	if (!GridInfo->m_arrCell.IsValidIndex(Index))
 		return FSlateColor(FLinearColor::Black);
 
-	switch (GridInfo->m_cellTypes[Index])
+	switch (GridInfo->m_arrCell[Index].typeCell)
 	{
 	case EGridType::GRID_SPAWN:
 		return FSlateColor(FLinearColor::Green);
@@ -93,20 +93,20 @@ FSlateColor FDetailGrid::GetCellColor(int32 Index) const
 
 FText FDetailGrid::GetButtonText(int32 Index) const
 {
-	if (!GridInfo->m_cellTypes.IsValidIndex(Index))
+	if (!GridInfo->m_arrCell.IsValidIndex(Index))
 		return FText::FromString(TEXT("Err"));
 
-	const EGridType Type = GridInfo->m_cellTypes[Index];
+	const EGridType Type = GridInfo->m_arrCell[Index].typeCell;
 	return FText::FromString(UEnum::GetValueAsString(Type));
 }
 
 FReply FDetailGrid::OnCellClicked(int32 Index)
 {
-	if (!GridInfo->m_cellTypes.IsValidIndex(Index))
+	if (!GridInfo->m_arrCell.IsValidIndex(Index))
 		return FReply::Handled();
 
 	EGridType tempType = static_cast<EGridType>(
-		(static_cast<uint8>(GridInfo->m_cellTypes[Index]) + 1) % 5);
+		(static_cast<uint8>(GridInfo->m_arrCell[Index].typeCell) + 1) % 5);
 	if (tempType == EGridType::GRID_SPAWN)
 	{
 		if (GridInfo->m_iSpawnIndex != -1)
@@ -121,7 +121,7 @@ FReply FDetailGrid::OnCellClicked(int32 Index)
 			tempType = EGridType::GRID_NULL;
 		}
 	}
-	GridInfo->m_cellTypes[Index] = tempType;
+	GridInfo->m_arrCell[Index].typeCell = tempType;
 
 	// 적용
 	if (GridInfo.IsValid())

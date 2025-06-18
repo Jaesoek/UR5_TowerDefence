@@ -25,6 +25,9 @@ AGrid::AGrid()
 		RootComponent = m_GridBody;
 	}
 
+	SplinePath = CreateDefaultSubobject<USplineComponent>(TEXT("Spline"));
+	SplinePath->SetupAttachment(RootComponent);
+
 	m_mapInsMeshComp.Add(EGridType::GRID_NULL, CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("DefaultMesh")));
 	m_mapInsMeshComp.Add(EGridType::GRID_SPAWN, CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("SpawnMesh")));
 	m_mapInsMeshComp.Add(EGridType::GRID_BUILDABLE, CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("BuildableMesh")));
@@ -42,6 +45,7 @@ void AGrid::OnConstruction(const FTransform& trans)
 	Super::OnConstruction(trans);
 
 	InitGrid();
+	InitPath();
 }
 
 void AGrid::BeginPlay()
@@ -73,9 +77,9 @@ void AGrid::InitGrid()
 	bool isSpawnSet = false, isGoalSet = false;
 	for (int32 iIndex = 0; iIndex < m_iNumCol * m_iNumRow; ++iIndex)
 	{
-		if (m_cellTypes.Num() <= iIndex)
+		if (m_arrCell.Num() <= iIndex)
 		{
-			m_cellTypes.Add(EGridType::GRID_NULL);
+			m_arrCell.Add(FGridCellInfo{});
 		}
 
 		FGridCoord gridCoord = GetCoord(iIndex);
@@ -84,7 +88,7 @@ void AGrid::InitGrid()
 		Location -= OriginOffset;
 		Location += CellOffset;
 
-		const EGridType& curGridType = m_cellTypes[iIndex];
+		const EGridType& curGridType = m_arrCell[iIndex].typeCell;
 		if (curGridType == EGridType::GRID_SPAWN)
 		{
 			isSpawnSet = true;
@@ -121,29 +125,33 @@ void AGrid::InitGrid()
 	}
 }
 
-void AGrid::InitPath(std::vector<bool>& vecDidVisited, int32 StartIndex, int32 GoalIndex)
+void AGrid::InitPath()
 {
-	/**
-	* Path block 기반 Spline 생성
+	/*
+	SplinePath->ClearSplinePoints();
+
+	if (m_iSpawnIndex == -1 || m_iGoalIndex == -1)
+	{
+		return;
+	}
 
 	TSet<FGridCoord> Visited;
 	TArray<int32> OrderedIndices;
 
-	FGridCoord Start = GetCoord(StartIndex);
-	FGridCoord Goal = GetCoord(GoalIndex);
+	FGridCoord Start = GetCoord(m_iSpawnIndex);
+	FGridCoord Goal = GetCoord(m_iGoalIndex);
 
-	PathSpline->AddPoint(FSplinePoint{Start});
+	SplinePath->AddSplinePoint(m_arrCell[m_iSpawnIndex].vPosRelative,
+		ESplineCoordinateSpace::Type::Local);
 	Visited.Add(Start);
 
-	// 우, 하, 상, 좌 순서
 	const TArray<FGridCoord> Directions = {
-		{ 1, 0 },  // Right
-		{ 0, 1 },  // Down
-		{ 0, -1 }, // Up
-		{ -1, 0 }  // Left
+		{ 1, 0 },
+		{ 0, 1 },
+		{ 0, -1 },
+		{ -1, 0 }
 	};
 
-	// DFS 스택 기반 루프
 	TArray<FGridCoord> Stack;
 	Stack.Add(Start);
 
@@ -153,25 +161,30 @@ void AGrid::InitPath(std::vector<bool>& vecDidVisited, int32 StartIndex, int32 G
 
 		for (const FGridCoord& Dir : Directions)
 		{
-			FGridCoord Next = { Current.X + Dir.X, Current.Y + Dir.Y };
+			FGridCoord Next = { Current.iRow + Dir.iRow, Current.iCol + Dir.iCol };
 
-			if (!IsValidCoord(Next.X, Next.Y) || Visited.Contains(Next))
+			if (!IsValidCoord(Next.iRow, Next.iCol) || Visited.Contains(Next))
 				continue;
 
-			int32 NextIdx = GetIndex(Next.X, Next.Y);
-
-			if (Grid[NextIdx] == EGridType::Path)
+			int32 NextIdx = GetIndex(Next.iRow, Next.iCol);
+			if (m_arrCell[NextIdx].typeCell == EGridType::GRID_PATH)
 			{
 				Visited.Add(Next);
 				OrderedIndices.Add(NextIdx);
-				Stack.Add(Next); // 다음 탐색 위치
-				break; // ✅ 방향 우선 순서 유지: 한 방향만 탐색 후 다시 루프 시작
+				Stack.Add(Next);
+
+				SplinePath->AddSplinePoint(m_arrCell[NextIdx].vPosRelative, ESplineCoordinateSpace::Type::Local);
+				break;
 			}
 		}
 	}
 
-	// 마지막 Goal 추가
-	OrderedIndices.Add(GoalIndex);
+	OrderedIndices.Add(m_iGoalIndex);
+
+	SplinePath->AddSplinePoint(m_arrCell[m_iGoalIndex].vPosRelative, ESplineCoordinateSpace::Type::Local);
+
+	SplinePath->SetClosedLoop(false);
+	SplinePath->UpdateSpline();
 	*/
 }
 
@@ -193,7 +206,7 @@ bool AGrid::AbleToBuild(const FVector& vInputPos, FVector& vBuildPos) const
 
 	int iCol = static_cast<int>(vPos.Y / CellWidth);
 	int iRow = static_cast<int>(vPos.X / CellHeight);
-	if (EGridType::GRID_BUILDABLE == m_cellTypes[GetIndex(iRow, iCol)])
+	if (EGridType::GRID_BUILDABLE == m_arrCell[GetIndex(iRow, iCol)].typeCell)
 	{
 		vBuildPos = GetActorLocation() - OriginOffset + CellOffset;
 		vBuildPos += FVector{ CellHeight * iRow, CellWidth * iCol, 0.0 };
@@ -216,7 +229,7 @@ EGridType AGrid::GetTileType(const FVector& vPos) const
 
 	if (row >= 0 && row < m_iNumRow && col >= 0 && col < m_iNumCol)
 	{
-		return m_cellTypes[GetIndex(row, col)];
+		return m_arrCell[GetIndex(row, col)].typeCell;
 	}
 	return EGridType::GRID_NULL;
 }
