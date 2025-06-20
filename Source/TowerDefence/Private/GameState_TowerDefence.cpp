@@ -1,6 +1,7 @@
 #include "GameState_TowerDefence.h"
 #include "EngineUtils.h"
 #include "TimerManager.h"
+#include "UI/UI_Manager.h"
 
 AGameState_TowerDefence::AGameState_TowerDefence()
 	: m_iCurLevel(-1)
@@ -16,6 +17,11 @@ void AGameState_TowerDefence::StartRound()
 		return;
 
 	m_iCurLevel += 1;
+
+	if (UUI_Manager* pUIManager = GetGameInstance()->GetSubsystem<UUI_Manager>())
+	{
+		pUIManager->OpenInProgress();
+	}
 }
 
 void AGameState_TowerDefence::SetGameState(ERoundState InRoundState)

@@ -14,6 +14,8 @@ enum class ERoundState : uint8
 	RoundMAX
 };
 
+class UUI_Manager;
+
 UCLASS()
 class TOWERDEFENCE_API AGameState_TowerDefence : public AGameStateBase
 {
@@ -52,6 +54,12 @@ protected:
 	FOnStateChanged OnStateChangedEvent[(uint8)ERoundState::RoundMAX];
 
 public:
+	template <typename UserClass>
+	void RegistEvent_WaitingRound(UserClass* InObject, typename TMemFunPtrType<false, UserClass, void()>::Type InFunc)
+	{
+		OnStateChangedEvent[(uint8)ERoundState::Round_Waiting].AddUObject(InObject, InFunc);
+	}
+
 	template <typename UserClass>
 	void RegistEvent_StartRound(UserClass* InObject, typename TMemFunPtrType<false, UserClass, void()>::Type InFunc)
 	{
