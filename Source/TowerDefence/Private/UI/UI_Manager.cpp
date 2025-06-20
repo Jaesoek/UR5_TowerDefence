@@ -37,7 +37,7 @@ void UUI_Manager::OpenUI(TSubclassOf<UUserWidget> userWidget)
 {
 	if (UWorld* World = GetWorld())
 	{
-		if (!CurrentWidget)
+		if (IsValid(CurrentWidget))
 		{
 			CurrentWidget->RemoveFromViewport();
 		}

@@ -13,17 +13,15 @@ enum class EGridType : uint8
 	GRID_NULL, GRID_SPAWN, GRID_PATH, GRID_BUILDABLE, GRID_GOAL
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FGridCellInfo
 {
 	GENERATED_BODY()
 
-	FGridCellInfo()
-		: typeCell(EGridType::GRID_NULL), vPosRelative({ 0.0, 0.0, 0.0 })
-	{
-	}
-
+	UPROPERTY(VisibleDefaultsOnly)
 	EGridType typeCell;
+
+	UPROPERTY(VisibleDefaultsOnly)
 	FVector	vPosRelative;
 };
 
