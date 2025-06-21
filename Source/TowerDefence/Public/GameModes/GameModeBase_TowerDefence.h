@@ -26,6 +26,7 @@ public:
 
 	virtual void StartSpawnMonster();
 	virtual void OnSpawnMonster();
+	virtual void SpawnFinish();
 
 	FORCEINLINE void SetGrid(TWeakObjectPtr<AGrid> pGrid) { Grid = pGrid; };
 
@@ -50,4 +51,8 @@ protected:
 
 	UPROPERTY(Transient)
 	TWeakObjectPtr<AGrid> Grid;
+
+private:
+	UPROPERTY(Transient)
+	int32 m_iTarget_NumMonster;
 };

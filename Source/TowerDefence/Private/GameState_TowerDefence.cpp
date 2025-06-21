@@ -11,6 +11,17 @@ AGameState_TowerDefence::AGameState_TowerDefence()
 {
 }
 
+void AGameState_TowerDefence::WaitRound()
+{
+	if (false == HasAuthority())
+		return;
+
+	if (UUI_Manager* pUIManager = GetGameInstance()->GetSubsystem<UUI_Manager>())
+	{
+		pUIManager->OpenWait();
+	}
+}
+
 void AGameState_TowerDefence::StartRound()
 {
 	if (false == HasAuthority())
@@ -31,6 +42,9 @@ void AGameState_TowerDefence::SetGameState(ERoundState InRoundState)
 
 	switch (InRoundState)	// Doing Job in GameState
 	{
+		case ERoundState::Round_Waiting:
+			WaitRound();
+			break;
 		case ERoundState::Round_InProgress:
 			StartRound();
 			break;
@@ -52,6 +66,15 @@ void AGameState_TowerDefence::SetMonsterNum(int32 iNumMonsters)
 	if (HasAuthority())
 	{
 		m_iRemainNum_Monsters = iNumMonsters;
+		OnMonsterNumChanged.Broadcast(m_iRemainNum_Monsters);
+	}
+}
+
+void AGameState_TowerDefence::AddMonster()
+{
+	if (HasAuthority())
+	{
+		++m_iRemainNum_Monsters;
 		OnMonsterNumChanged.Broadcast(m_iRemainNum_Monsters);
 	}
 }

@@ -92,9 +92,11 @@ void AGameModeBase_TowerDefence::StartSpawnMonster()
 	}
  
     FStageWaveInfo StageWaveInfo = StageAsset.Get()->StageWaveInfos[CachedGameState->GetCurrentLevel()];
-    if (StageWaveInfo.SpawnInterval > 0.f)
+	if (StageWaveInfo.SpawnInterval > 0.f)
     {
-        GetWorldTimerManager().SetTimer(
+		m_iTarget_NumMonster = StageWaveInfo.Count;
+
+		GetWorldTimerManager().SetTimer(
             Timers.FindOrAdd("SpawnMonster"),
             this,
             &ThisClass::OnSpawnMonster,
@@ -117,10 +119,13 @@ void AGameModeBase_TowerDefence::OnSpawnMonster()
         StageWaveInfo.MonsterAsset.LoadSynchronous();
     }
 
-    if (StageWaveInfo.MonsterAsset.IsValid() && IsValid(StageWaveInfo.MonsterAsset.Get()->MonsterClass))
+	if (StageWaveInfo.MonsterAsset.IsValid() && IsValid(StageWaveInfo.MonsterAsset.Get()->MonsterClass))
     {
 		if (Grid.IsValid() && Grid->IsSpawnSet())
 		{
+			--m_iTarget_NumMonster;
+			CachedGameState->AddMonster();
+
 			FTransform spawnTrans = Grid->GetSpawnTransform();
 
 			auto&& pMonster = GetWorld()->SpawnActorDeferred<AMonsterBase_TowerDefence>(
@@ -131,4 +136,22 @@ void AGameModeBase_TowerDefence::OnSpawnMonster()
 			UGameplayStatics::FinishSpawningActor(pMonster, spawnTrans);
 		}
 	}
+
+	// Stop spawn timer when finished
+	if (m_iTarget_NumMonster == 0)
+	{
+		SpawnFinish();
+	}
+}
+
+void AGameModeBase_TowerDefence::SpawnFinish()
+{
+	GetWorld()->GetTimerManager().ClearTimer(Timers.FindOrAdd("SpawnMonster"));
+	
+	if (!IsValid(CachedGameState))
+	{
+		return;
+	}
+
+	// TODO: 시간 기다렸다가 Finish 호출하기
 }

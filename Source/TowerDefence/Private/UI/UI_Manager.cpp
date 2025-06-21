@@ -19,11 +19,11 @@ bool UUI_Manager::ShouldCreateSubsystem(UObject* Outer) const
 	return false;
 }
 
-void UUI_Manager::OpenLogo()
+void UUI_Manager::OpenWait()
 {
-	if (!IsValid(UI_Asset) || !UI_Asset->UI_Logo) return;
+	if (!IsValid(UI_Asset) || !UI_Asset->UI_Wait) return;
 
-	OpenUI(UI_Asset->UI_Logo);
+	OpenUI(UI_Asset->UI_Wait);
 }
 
 void UUI_Manager::OpenInProgress()

@@ -29,12 +29,14 @@ public:
 
 	int32 GetMonsterNum() const { return m_iRemainNum_Monsters; }
 	void SetMonsterNum(int32 iNumMonsters);
+	void AddMonster();
 	void DecreaseMonster();
 
 protected:
 	// GameState Interface
 	// ~GameState Interface
 
+	virtual void WaitRound();
 	virtual void StartRound();
 
 	UPROPERTY(Transient)

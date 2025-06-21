@@ -16,7 +16,7 @@ friend class UGameInstance_TowerDefence;
 public:
 	virtual bool ShouldCreateSubsystem(UObject* Outer) const override;
 
-	void OpenLogo();
+	void OpenWait();
 	void OpenInProgress();
 
 protected:

@@ -14,7 +14,7 @@ public:
 	TSubclassOf<UUserWidget>	UI_Logo;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI List")
-	TSubclassOf<UUserWidget> UI_Start;
+	TSubclassOf<UUserWidget> UI_Wait;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI List")
 	TSubclassOf<UUserWidget> UI_InProgress;
