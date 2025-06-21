@@ -4,8 +4,6 @@
 #include "LevelDesign/Grid.h"
 #include "Components/InstancedStaticMeshComponent.h"
 #include "Components/BoxComponent.h"
-#include "Components/SplineComponent.h"
-#include "Components/SplineComponent.h"
 #include "GameModes/GameModeBase_TowerDefence.h"
 
 #if WITH_EDITOR
@@ -27,6 +25,7 @@ AGrid::AGrid()
 
 	SplinePath = CreateDefaultSubobject<USplineComponent>(TEXT("Spline"));
 	SplinePath->SetupAttachment(RootComponent);
+	SplinePath->bDrawDebug = true;
 
 	m_mapInsMeshComp.Add(EGridType::GRID_NULL, CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("DefaultMesh")));
 	m_mapInsMeshComp.Add(EGridType::GRID_SPAWN, CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("SpawnMesh")));
@@ -46,6 +45,10 @@ void AGrid::OnConstruction(const FTransform& trans)
 
 	InitGrid();
 	InitPath();
+
+#if WITH_EDITOR
+	DrawSplineDebug();
+#endif
 }
 
 void AGrid::BeginPlay()
@@ -87,6 +90,8 @@ void AGrid::InitGrid()
 		FVector Location = FVector(CellHeight * gridCoord.iRow, CellWidth * gridCoord.iCol, 0.f);
 		Location -= OriginOffset;
 		Location += CellOffset;
+		m_arrCell[iIndex].vPosRelative = Location;
+		m_arrCell[iIndex].vPosRelative[2] = 100.0;
 
 		const EGridType& curGridType = m_arrCell[iIndex].typeCell;
 		if (curGridType == EGridType::GRID_SPAWN)
@@ -127,7 +132,6 @@ void AGrid::InitGrid()
 
 void AGrid::InitPath()
 {
-	/*
 	SplinePath->ClearSplinePoints();
 
 	if (m_iSpawnIndex == -1 || m_iGoalIndex == -1)
@@ -136,13 +140,12 @@ void AGrid::InitPath()
 	}
 
 	TSet<FGridCoord> Visited;
-	TArray<int32> OrderedIndices;
 
 	FGridCoord Start = GetCoord(m_iSpawnIndex);
 	FGridCoord Goal = GetCoord(m_iGoalIndex);
 
-	SplinePath->AddSplinePoint(m_arrCell[m_iSpawnIndex].vPosRelative,
-		ESplineCoordinateSpace::Type::Local);
+	SplinePath->AddSplinePoint(m_arrCell[m_iSpawnIndex].vPosRelative + GetActorLocation(),
+		ESplineCoordinateSpace::Type::World);
 	Visited.Add(Start);
 
 	const TArray<FGridCoord> Directions = {
@@ -170,22 +173,20 @@ void AGrid::InitPath()
 			if (m_arrCell[NextIdx].typeCell == EGridType::GRID_PATH)
 			{
 				Visited.Add(Next);
-				OrderedIndices.Add(NextIdx);
 				Stack.Add(Next);
 
-				SplinePath->AddSplinePoint(m_arrCell[NextIdx].vPosRelative, ESplineCoordinateSpace::Type::Local);
+				SplinePath->AddSplinePoint(m_arrCell[NextIdx].vPosRelative + GetActorLocation(),
+					ESplineCoordinateSpace::Type::World);
 				break;
 			}
 		}
 	}
 
-	OrderedIndices.Add(m_iGoalIndex);
-
-	SplinePath->AddSplinePoint(m_arrCell[m_iGoalIndex].vPosRelative, ESplineCoordinateSpace::Type::Local);
+	SplinePath->AddSplinePoint(m_arrCell[m_iGoalIndex].vPosRelative + GetActorLocation(),
+		ESplineCoordinateSpace::Type::World);
 
 	SplinePath->SetClosedLoop(false);
 	SplinePath->UpdateSpline();
-	*/
 }
 
 bool AGrid::AbleToBuild(const FVector& vInputPos, FVector& vBuildPos) const
@@ -235,6 +236,20 @@ EGridType AGrid::GetTileType(const FVector& vPos) const
 }
 
 #if WITH_EDITOR
+
+void AGrid::DrawSplineDebug()
+{
+	if (!IsValid(SplinePath)) return;
+
+	const int32 NumPoints = SplinePath->GetNumberOfSplinePoints();
+	for (int32 i = 0; i < NumPoints - 1; ++i)
+	{
+		FVector Start = SplinePath->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::World);
+		FVector End = SplinePath->GetLocationAtSplinePoint(i + 1, ESplineCoordinateSpace::World);
+
+		DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, -1.f, 0, 10.f);
+	}
+}
 
 void AGrid::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {

@@ -133,6 +133,7 @@ void AGameModeBase_TowerDefence::OnSpawnMonster()
 				ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn
 			);
 			pMonster->SetupAsset(StageWaveInfo.MonsterAsset.Get());
+			pMonster->SetupSplinePath(Grid->GetSpline());
 			UGameplayStatics::FinishSpawningActor(pMonster, spawnTrans);
 		}
 	}

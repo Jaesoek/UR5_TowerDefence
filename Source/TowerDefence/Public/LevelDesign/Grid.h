@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/SplineComponent.h"
 #include "Grid.generated.h"
 
 
@@ -25,6 +26,20 @@ struct FGridCellInfo
 	FVector	vPosRelative;
 };
 
+
+struct FGridCoord
+{
+	int32 iRow, iCol;
+	bool operator==(const FGridCoord& Other) const
+	{
+		return iCol == Other.iCol && iRow == Other.iRow;
+	}
+};
+FORCEINLINE uint32 GetTypeHash(const FGridCoord& MyStruct)
+{
+	return HashCombine(::GetTypeHash(MyStruct.iRow), ::GetTypeHash(MyStruct.iCol));
+}
+
 UCLASS()
 class TOWERDEFENCE_API AGrid : public AActor
 {
@@ -32,11 +47,6 @@ class TOWERDEFENCE_API AGrid : public AActor
 
 friend class FDetailGrid;
 
-struct FGridCoord
-{
-	int32 iRow, iCol;
-	bool operator==(const FGridCoord& Other) const { return iCol == Other.iCol && iRow == Other.iRow; }
-};
 
 public:	
 	AGrid();
@@ -69,7 +79,7 @@ protected:
 	TArray<FGridCellInfo> m_arrCell;
 
 	UPROPERTY(Transient)
-	TObjectPtr<class USplineComponent>	SplinePath;	// Path for monsters
+	TObjectPtr<USplineComponent>	SplinePath;	// Path for monsters
 
 	UPROPERTY(Transient)
 	FVector m_vSpawnPos;
@@ -89,6 +99,10 @@ public:
 	UFUNCTION()
 	virtual bool AbleToBuild(const FVector& vInputPos, FVector& vBuildPos) const;
 
+	FORCEINLINE TWeakObjectPtr<const USplineComponent> GetSpline()
+	{
+		return SplinePath;
+	}
 
 	FORCEINLINE bool IsSpawnSet() const
 	{
@@ -122,6 +136,7 @@ public:
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	void DrawSplineDebug();
 #endif
 
 

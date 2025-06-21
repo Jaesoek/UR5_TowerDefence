@@ -5,8 +5,9 @@
 #include "Components/CapsuleComponent.h"
 
 AMonsterBase_TowerDefence::AMonsterBase_TowerDefence()
+	: Health(0.f), m_fTargetDistance(0.f), m_fCurDistance(0.f)
 {
-	PrimaryActorTick.bCanEverTick = false; // ���� �Ⱦ��� ��Ȱ��ȭ
+	PrimaryActorTick.bCanEverTick = true; // ���� �Ⱦ��� ��Ȱ��ȭ
 
 	AIControllerClass = AMonsterAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
@@ -55,6 +56,38 @@ void AMonsterBase_TowerDefence::SetupAsset(const UMonsterAsset* InMonsterAsset)
 	}
 
 	Health = InMonsterAsset->Health;
+}
+
+void AMonsterBase_TowerDefence::SetupSplinePath(TWeakObjectPtr<const USplineComponent> pSplinePath)
+{
+	if (pSplinePath.IsValid())
+	{
+		SplinePath = pSplinePath;
+		m_fTargetDistance = SplinePath->GetSplineLength();
+		m_fCurDistance = 0.f;
+	}
+	else
+	{
+		SplinePath = nullptr;
+	}
+}
+
+void AMonsterBase_TowerDefence::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (SplinePath.IsValid())
+	{
+		m_fCurDistance += 100.f * DeltaSeconds;
+		if (m_fCurDistance >= m_fTargetDistance)
+		{
+			m_fCurDistance = m_fTargetDistance;
+			// TODO: Attack
+		}
+
+		FVector&& vCurLocation = SplinePath->GetLocationAtDistanceAlongSpline(m_fCurDistance, ESplineCoordinateSpace::Type::World);
+		SetActorLocation(vCurLocation);
+	}
 }
 
 void AMonsterBase_TowerDefence::Destroyed()
