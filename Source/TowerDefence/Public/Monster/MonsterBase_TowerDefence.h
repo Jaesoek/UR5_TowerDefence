@@ -23,12 +23,16 @@ public:
 protected:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void Destroyed() override;
+	virtual void Attack();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats")
 	float Health;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats")
+	float Speed;
 
 	UPROPERTY(Transient)
 	TWeakObjectPtr<const USplineComponent> SplinePath;

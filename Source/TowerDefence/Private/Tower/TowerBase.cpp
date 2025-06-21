@@ -36,6 +36,7 @@ ATowerBase::ATowerBase()
 	{
 		m_SKMesh->SetupAttachment(RootComponent);
 		m_SKMesh->SetRelativeLocation(FVector(0.f, 0.f, -fHalfHeight));
+		m_SKMesh->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 	}
 
 	m_pAttackRange = CreateDefaultSubobject<USphereComponent>(TEXT("DetectionSphere"));
@@ -62,6 +63,13 @@ void ATowerBase::PostInitializeComponents()
 
 		m_pAttackRange->SetSphereRadius(m_TowerAsset->AttackRange);
 	}
+}
+
+void ATowerBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	SetActorRotation(FRotator(0.0, 180.0, 0.0));
 }
 
 void ATowerBase::OnMonsterEnter(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,

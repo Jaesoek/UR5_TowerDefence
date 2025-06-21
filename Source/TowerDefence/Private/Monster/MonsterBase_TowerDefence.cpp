@@ -5,7 +5,7 @@
 #include "Components/CapsuleComponent.h"
 
 AMonsterBase_TowerDefence::AMonsterBase_TowerDefence()
-	: Health(0.f), m_fTargetDistance(0.f), m_fCurDistance(0.f)
+	: Health(0.f), Speed(0.f), m_fTargetDistance(0.f), m_fCurDistance(0.f)
 {
 	PrimaryActorTick.bCanEverTick = true; // ���� �Ⱦ��� ��Ȱ��ȭ
 
@@ -36,6 +36,7 @@ AMonsterBase_TowerDefence::AMonsterBase_TowerDefence()
 	{
 		SkeletalMeshComponent->SetupAttachment(RootComponent);
 		SkeletalMeshComponent->SetRelativeLocation(FVector{ 0.f, 0.f, -fHalfHeight });
+		SkeletalMeshComponent->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 	}
 }
 
@@ -56,6 +57,7 @@ void AMonsterBase_TowerDefence::SetupAsset(const UMonsterAsset* InMonsterAsset)
 	}
 
 	Health = InMonsterAsset->Health;
+	Speed = InMonsterAsset->Speed;
 }
 
 void AMonsterBase_TowerDefence::SetupSplinePath(TWeakObjectPtr<const USplineComponent> pSplinePath)
@@ -78,15 +80,18 @@ void AMonsterBase_TowerDefence::Tick(float DeltaSeconds)
 
 	if (SplinePath.IsValid())
 	{
-		m_fCurDistance += 100.f * DeltaSeconds;
+		m_fCurDistance += Speed * DeltaSeconds;
 		if (m_fCurDistance >= m_fTargetDistance)
 		{
-			m_fCurDistance = m_fTargetDistance;
-			// TODO: Attack
+			Attack();
 		}
-
-		FVector&& vCurLocation = SplinePath->GetLocationAtDistanceAlongSpline(m_fCurDistance, ESplineCoordinateSpace::Type::World);
-		SetActorLocation(vCurLocation);
+		else
+		{
+			const FVector&& vCurLocation = SplinePath->GetLocationAtDistanceAlongSpline(m_fCurDistance, ESplineCoordinateSpace::Type::World);
+			const FRotator&& vCurRotator = SplinePath->GetRotationAtDistanceAlongSpline(m_fCurDistance, ESplineCoordinateSpace::Type::World);
+			SetActorLocation(vCurLocation);
+			SetActorRotation(vCurRotator);
+		}
 	}
 }
 
@@ -105,4 +110,9 @@ void AMonsterBase_TowerDefence::Destroyed()
 	}
 }
 
+void AMonsterBase_TowerDefence::Attack()
+{
+	// TODO: Attack to player health
+	Destroy();
+}
 
