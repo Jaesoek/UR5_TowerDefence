@@ -27,7 +27,8 @@ public:
 	virtual void SetGameState(ERoundState InRoundState);
 	FORCEINLINE virtual int32 GetCurrentLevel() { return m_iCurLevel; }
 
-	void SetMonsterNum(int32 iNumMonsters);	// For testing
+	int32 GetMonsterNum() const { return m_iRemainNum_Monsters; }
+	void SetMonsterNum(int32 iNumMonsters);
 	void DecreaseMonster();
 
 protected:
@@ -53,7 +54,16 @@ protected:
 	DECLARE_MULTICAST_DELEGATE(FOnStateChanged)
 	FOnStateChanged OnStateChangedEvent[(uint8)ERoundState::RoundMAX];
 
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnMonsterNumChanged, int32)
+	FOnMonsterNumChanged OnMonsterNumChanged;
+
 public:
+	template <typename UserClass>
+	void RegistEvent_MonsterNumChanged(UserClass* InObject, typename TMemFunPtrType<false, UserClass, void(int32)>::Type InFunc)
+	{
+		OnMonsterNumChanged.AddUObject(InObject, InFunc);
+	}
+
 	template <typename UserClass>
 	void RegistEvent_WaitingRound(UserClass* InObject, typename TMemFunPtrType<false, UserClass, void()>::Type InFunc)
 	{

@@ -52,6 +52,7 @@ void AGameState_TowerDefence::SetMonsterNum(int32 iNumMonsters)
 	if (HasAuthority())
 	{
 		m_iRemainNum_Monsters = iNumMonsters;
+		OnMonsterNumChanged.Broadcast(m_iRemainNum_Monsters);
 	}
 }
 
@@ -60,10 +61,11 @@ void AGameState_TowerDefence::DecreaseMonster()
 	if (HasAuthority())
 	{
 		--m_iRemainNum_Monsters;
+		OnMonsterNumChanged.Broadcast(m_iRemainNum_Monsters);
 	}
 
 	if (m_iRemainNum_Monsters == 0)
 	{
-
+		// TODO: Stage finish
 	}
 }
