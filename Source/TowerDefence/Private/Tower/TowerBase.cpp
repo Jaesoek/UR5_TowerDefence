@@ -5,12 +5,14 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/SphereComponent.h"
 #include "Monster/MonsterBase_TowerDefence.h"
 
 ATowerBase::ATowerBase()
+	: m_fAttackRange(0.0)
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	bUseControllerRotationYaw = true;
 
 	const float fHalfHeight = 50.f;	// Only for init
 
@@ -38,20 +40,6 @@ ATowerBase::ATowerBase()
 		m_SKMesh->SetRelativeLocation(FVector(0.f, 0.f, -fHalfHeight));
 		m_SKMesh->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 	}
-
-	m_pAttackRange = CreateDefaultSubobject<USphereComponent>(TEXT("DetectionSphere"));
-	if (m_pAttackRange)
-	{
-		m_pAttackRange->SetupAttachment(RootComponent);
-
-		pCapsule->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		pCapsule->SetCollisionObjectType(ECC_Camera);
-		pCapsule->SetCollisionResponseToAllChannels(ECR_Ignore);
-		pCapsule->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-
-		m_pAttackRange->OnComponentBeginOverlap.AddDynamic(this, &ATowerBase::OnMonsterEnter);
-		m_pAttackRange->OnComponentEndOverlap.AddDynamic(this, &ATowerBase::OnMonsterExit);
-	}
 }
 
 void ATowerBase::PostInitializeComponents()
@@ -67,7 +55,7 @@ void ATowerBase::PostInitializeComponents()
 		m_SKMesh->SetSkeletalMeshAsset(m_TowerAsset->TowerMesh.Get());
 		m_SKMesh->SetAnimInstanceClass(m_TowerAsset->AnimInstance);
 
-		m_pAttackRange->SetSphereRadius(m_TowerAsset->AttackRange);
+		m_fAttackRange = m_TowerAsset->AttackRange;
 	}
 }
 
@@ -94,26 +82,6 @@ void ATowerBase::BeginPlay()
 	}
 }
 
-void ATowerBase::OnMonsterEnter(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (OtherActor && Cast<AMonsterBase_TowerDefence>(OtherActor))
-	{
-		if (!IsValid(m_pCurTarget.Get()))
-		{
-			SetCurTarget(OtherActor);
-		}
-	}
-}
-
-void ATowerBase::OnMonsterExit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	if (m_pCurTarget == OtherActor)
-	{
-		SetCurTarget();
-	}
-}
-
 bool ATowerBase::Attack()
 {
 	if (!m_TowerAsset)
@@ -121,7 +89,7 @@ bool ATowerBase::Attack()
 		return false;
 	}
 
-	if (m_pCurTarget.IsValid() && IsValid(m_TowerAsset->AttackMontage) && !m_SKMesh->GetAnimInstance()->Montage_IsPlaying(m_TowerAsset->AttackMontage))
+	if (IsValid(m_TowerAsset->AttackMontage) && !m_SKMesh->GetAnimInstance()->Montage_IsPlaying(m_TowerAsset->AttackMontage))
 	{
 		m_SKMesh->GetAnimInstance()->Montage_Play(m_TowerAsset->AttackMontage);
 		return true;
@@ -141,26 +109,6 @@ void ATowerBase::FollowTo(FVector& vTargetPos)
 	//{
 	//	SetActorLocation(vTargetPos);
 	//}
-}
-
-void ATowerBase::SetCurTarget(AActor* pActor)
-{
-	if (pActor != nullptr)
-	{
-		m_pCurTarget = pActor;
-
-		return;
-	}
-
-	TArray<AActor*> arrActors;
-	m_pAttackRange->GetOverlappingActors(arrActors);
-	for (auto iter = arrActors.CreateIterator(); iter; ++iter)
-	{
-		if (IsValid(*iter))
-		{
-			m_pCurTarget = *iter;
-		}
-	}
 }
 
 void ATowerBase::OnFocused()
