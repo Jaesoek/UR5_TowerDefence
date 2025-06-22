@@ -43,6 +43,12 @@ ATowerBase::ATowerBase()
 	if (m_pAttackRange)
 	{
 		m_pAttackRange->SetupAttachment(RootComponent);
+
+		pCapsule->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		pCapsule->SetCollisionObjectType(ECC_Camera);
+		pCapsule->SetCollisionResponseToAllChannels(ECR_Ignore);
+		pCapsule->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+
 		m_pAttackRange->OnComponentBeginOverlap.AddDynamic(this, &ATowerBase::OnMonsterEnter);
 		m_pAttackRange->OnComponentEndOverlap.AddDynamic(this, &ATowerBase::OnMonsterExit);
 	}
@@ -70,6 +76,22 @@ void ATowerBase::BeginPlay()
 	Super::BeginPlay();
 
 	SetActorRotation(FRotator(0.0, 180.0, 0.0));
+
+	if (HasAuthority())	// Self possess, only server side
+	{
+		if (Controller == nullptr)
+		{
+			if (m_TowerAsset->AI_Controller)
+			{
+				AAIController* AIController = GetWorld()->SpawnActor<AAIController>(
+					m_TowerAsset->AI_Controller, GetActorLocation(), GetActorRotation());
+				if (AIController)
+				{
+					AIController->Possess(this);
+				}
+			}
+		}
+	}
 }
 
 void ATowerBase::OnMonsterEnter(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
@@ -99,8 +121,7 @@ bool ATowerBase::Attack()
 		return false;
 	}
 
-	//IsValid(m_pCurTarget) &&
-	if (IsValid(m_TowerAsset->AttackMontage) && !m_SKMesh->GetAnimInstance()->Montage_IsPlaying(m_TowerAsset->AttackMontage))
+	if (m_pCurTarget.IsValid() && IsValid(m_TowerAsset->AttackMontage) && !m_SKMesh->GetAnimInstance()->Montage_IsPlaying(m_TowerAsset->AttackMontage))
 	{
 		m_SKMesh->GetAnimInstance()->Montage_Play(m_TowerAsset->AttackMontage);
 		return true;

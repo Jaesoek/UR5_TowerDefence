@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "Types/CombatType.h"
+#include "Tower/AIController_Tower.h"
 #include "TowerAsset.generated.h"
 
 UCLASS()
@@ -11,6 +12,9 @@ class TOWERDEFENCE_API UTowerAsset : public UDataAsset
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI Controller")
+	TSubclassOf<AAIController_Tower> AI_Controller;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tower")
 	FString TowerName;
 
