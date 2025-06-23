@@ -3,6 +3,7 @@
 
 #include "Tower/TowerBase.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "Engine/DamageEvents.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Monster/MonsterBase_TowerDefence.h"
@@ -82,16 +83,17 @@ void ATowerBase::BeginPlay()
 	}
 }
 
-bool ATowerBase::Attack()
+bool ATowerBase::Attack(AActor* pTarget)
 {
 	if (!m_TowerAsset)
 	{
 		return false;
 	}
 
-	if (IsValid(m_TowerAsset->AttackMontage) && !m_SKMesh->GetAnimInstance()->Montage_IsPlaying(m_TowerAsset->AttackMontage))
+	if (IsValid(pTarget) && IsValid(m_TowerAsset->AttackMontage) && !m_SKMesh->GetAnimInstance()->Montage_IsPlaying(m_TowerAsset->AttackMontage))
 	{
 		m_SKMesh->GetAnimInstance()->Montage_Play(m_TowerAsset->AttackMontage);
+		pTarget->TakeDamage(10.f, FPointDamageEvent{}, GetController(), this);
 		return true;
 	}
 

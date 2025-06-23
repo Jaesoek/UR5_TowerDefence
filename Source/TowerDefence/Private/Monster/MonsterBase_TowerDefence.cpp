@@ -74,6 +74,19 @@ void AMonsterBase_TowerDefence::SetupSplinePath(TWeakObjectPtr<const USplineComp
 	}
 }
 
+float AMonsterBase_TowerDefence::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float finalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	Health -= finalDamage;
+	if (Health <= 0.f)
+	{
+		Destroy();
+	}
+
+	return finalDamage;
+}
+
 void AMonsterBase_TowerDefence::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);

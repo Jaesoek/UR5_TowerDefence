@@ -10,11 +10,6 @@ EBTNodeResult::Type UBTTask_TowerAttack::ExecuteTask(UBehaviorTreeComponent& Own
 	AAIController_Tower* aiControl = Cast<AAIController_Tower>(OwnerComp.GetAIOwner());
 	if (!IsValid(aiControl))
 	{
-		GEngine->AddOnScreenDebugMessage(
-			-1, 1.0f, FColor::Green,
-			TEXT("Something wrong")
-		);
-
 		return EBTNodeResult::Failed;
 	}
 
@@ -24,7 +19,8 @@ EBTNodeResult::Type UBTTask_TowerAttack::ExecuteTask(UBehaviorTreeComponent& Own
 		return EBTNodeResult::Failed;
 	}
 
-	if (controlledPawn->Attack())
+	AActor* pTarget = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("TargetObject")));
+	if (controlledPawn->Attack(pTarget))
 	{
 		return EBTNodeResult::Succeeded;
 	}

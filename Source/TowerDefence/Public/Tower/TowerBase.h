@@ -43,7 +43,7 @@ public:
 		return m_fAttackRange * m_fAttackRange;
 	}
 
-	virtual bool Attack() final;
+	virtual bool Attack(AActor* pTarget) final;
 
 	virtual void FollowTo(FVector& vTargetPos) final;	// 임시: 로직정리되면 지울게요
 

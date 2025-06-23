@@ -22,6 +22,7 @@ public:
 
 protected:
 	virtual void Tick(float DeltaSeconds) override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void Destroyed() override;
 	virtual void Attack();
 
