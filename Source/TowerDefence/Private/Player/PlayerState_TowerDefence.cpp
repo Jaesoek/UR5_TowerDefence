@@ -4,7 +4,7 @@
 #include "Player/PlayerState_TowerDefence.h"
 
 APlayerState_TowerDefence::APlayerState_TowerDefence()
-	: CurScore(0), CurHealth(0.f)
+	: MaxHealth(20), CurScore(0), CurHealth(0.f)
 {
 }
 
