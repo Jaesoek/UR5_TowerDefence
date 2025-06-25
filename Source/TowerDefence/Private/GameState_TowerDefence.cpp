@@ -2,6 +2,7 @@
 #include "EngineUtils.h"
 #include "TimerManager.h"
 #include "UI/UI_Manager.h"
+#include "Net/UnrealNetwork.h"
 
 AGameState_TowerDefence::AGameState_TowerDefence()
 	: m_iCurLevel(-1)
@@ -11,27 +12,30 @@ AGameState_TowerDefence::AGameState_TowerDefence()
 {
 }
 
-void AGameState_TowerDefence::WaitRound()
+void AGameState_TowerDefence::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	if (false == HasAuthority())
-		return;
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	if (UUI_Manager* pUIManager = GetGameInstance()->GetSubsystem<UUI_Manager>())
-	{
-		pUIManager->OpenWait();
-	}
+	DOREPLIFETIME(AGameState_TowerDefence, m_iCurLevel);
+	DOREPLIFETIME(AGameState_TowerDefence, m_curRoundState);
 }
 
-void AGameState_TowerDefence::StartRound()
+void AGameState_TowerDefence::OnRep_RoundState()
 {
-	if (false == HasAuthority())
-		return;
-
-	m_iCurLevel += 1;
-
-	if (UUI_Manager* pUIManager = GetGameInstance()->GetSubsystem<UUI_Manager>())
+	switch (m_curRoundState)	// Doing Client Job
 	{
-		pUIManager->OpenInProgress();
+	case ERoundState::Round_Waiting:
+		if (UUI_Manager* pUIManager = GetGameInstance()->GetSubsystem<UUI_Manager>())
+		{
+			pUIManager->OpenWait();
+		}
+		break;
+	case ERoundState::Round_InProgress:
+		if (UUI_Manager* pUIManager = GetGameInstance()->GetSubsystem<UUI_Manager>())
+		{
+			pUIManager->OpenInProgress();
+		}
+		break;
 	}
 }
 
@@ -40,19 +44,16 @@ void AGameState_TowerDefence::SetGameState(ERoundState InRoundState)
 	if (false == HasAuthority())
 		return;
 
-	switch (InRoundState)	// Doing Job in GameState
-	{
-		case ERoundState::Round_Waiting:
-			WaitRound();
-			break;
-		case ERoundState::Round_InProgress:
-			StartRound();
-			break;
-	}
-
 	if (m_curRoundState != InRoundState)
 	{
 		m_curRoundState = InRoundState;
+
+		switch (m_curRoundState)	// Doing Server Job
+		{
+		case ERoundState::Round_InProgress:
+			m_iCurLevel += 1;
+			break;
+		}
 
 		if (OnStateChangedEvent[(uint8)m_curRoundState].IsBound())
 		{

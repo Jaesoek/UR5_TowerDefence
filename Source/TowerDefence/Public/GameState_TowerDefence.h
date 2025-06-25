@@ -36,13 +36,15 @@ protected:
 	// GameState Interface
 	// ~GameState Interface
 
-	virtual void WaitRound();
-	virtual void StartRound();
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	UPROPERTY(Transient)
+	UFUNCTION()
+	void OnRep_RoundState();
+
+	UPROPERTY(Transient, Replicated)
 	int32 m_iCurLevel;
 
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, Replicated, ReplicatedUsing = OnRep_RoundState)
 	ERoundState m_curRoundState;
 
 	UPROPERTY(Transient)
