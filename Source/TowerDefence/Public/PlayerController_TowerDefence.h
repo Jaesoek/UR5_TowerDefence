@@ -24,6 +24,9 @@ protected:
 	void HandelMoveTo(const FInputActionValue& Value);
 	void HandelBuild(const FInputActionValue& Value);
 
+	UFUNCTION(Server, Reliable)
+	void Server_SpawnTower(FVector vSpawnPos);
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input Mode")
 	TObjectPtr<UInputMappingContext> m_pDefaultMappingContext;

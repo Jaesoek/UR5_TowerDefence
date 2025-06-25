@@ -93,12 +93,7 @@ void APlayerController_TowerDefence::HandelBuild(const FInputActionValue& Value)
 		FVector vResultPos;
 		if (pGrid->AbleToBuild(HitResult.Location, vResultPos))
 		{
-			FTransform targetTrans = FTransform{ FRotator::ZeroRotator, vResultPos, FVector::One() };
-			ATowerBase* pTower = GetWorld()->SpawnActorDeferred<ATowerBase>(
-				ATowerBase::StaticClass(), targetTrans, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn
-			);
-			pTower->SetTowerAsset(ArrayTowerAssets[0]);
-			UGameplayStatics::FinishSpawningActor(pTower, targetTrans);
+			Server_SpawnTower(vResultPos);
 		}
 		else
 		{
@@ -106,4 +101,20 @@ void APlayerController_TowerDefence::HandelBuild(const FInputActionValue& Value)
 				TEXT("Can't build in here"));
 		}
 	}
+}
+
+void APlayerController_TowerDefence::Server_SpawnTower_Implementation(FVector vSpawnPos)
+{
+	if (false == HasAuthority())
+	{
+		return;
+	}
+
+	FTransform targetTrans = FTransform{ FRotator::ZeroRotator, vSpawnPos, FVector::One() };
+	ATowerBase* pTower = GetWorld()->SpawnActorDeferred<ATowerBase>(
+		ATowerBase::StaticClass(), targetTrans, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn
+	);
+	pTower->SetTowerAsset(ArrayTowerAssets[0]);
+	pTower->SetReplicates(true);
+	UGameplayStatics::FinishSpawningActor(pTower, targetTrans);
 }

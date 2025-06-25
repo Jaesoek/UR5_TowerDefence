@@ -12,6 +12,7 @@ ATowerBase::ATowerBase()
 	: m_fAttackRange(0.0)
 {
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
 
 	bUseControllerRotationYaw = true;
 
