@@ -6,6 +6,7 @@
 #include "Monster/MonsterAsset.h"
 #include "Monster/MonsterBase_TowerDefence.h"
 #include "Stage/StageAsset.h"
+#include "Player/PlayerState_TowerDefence.h"
 #include "LevelDesign/Grid.h"			// For getting spawn position
 #include "Kismet/GameplayStatics.h"		// For deferred spawning
 
@@ -155,4 +156,14 @@ void AGameModeBase_TowerDefence::SpawnFinish()
 	}
 
 	// TODO: 시간 기다렸다가 Finish 호출하기
+}
+
+void AGameModeBase_TowerDefence::AddScore(AController* EventInstigator, int32 iScore)
+{
+	if (!IsValid(EventInstigator))
+	{
+		return;
+	}
+
+	EventInstigator->GetPlayerState<APlayerState_TowerDefence>()->AddScore(iScore);
 }

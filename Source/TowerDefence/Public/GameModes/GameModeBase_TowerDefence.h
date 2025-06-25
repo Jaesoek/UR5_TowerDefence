@@ -28,6 +28,8 @@ public:
 	virtual void OnSpawnMonster();
 	virtual void SpawnFinish();
 
+	virtual void AddScore(AController* EventInstigator, int32 iScore);
+
 	FORCEINLINE void SetGrid(TWeakObjectPtr<AGrid> pGrid) { Grid = pGrid; };
 
 protected:

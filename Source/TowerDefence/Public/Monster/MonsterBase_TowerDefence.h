@@ -35,6 +35,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats")
 	float Speed;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats")
+	int32 Score;
+
 	UPROPERTY(Transient)
 	TWeakObjectPtr<const USplineComponent> SplinePath;
 

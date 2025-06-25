@@ -2,6 +2,7 @@
 #include "../Public/GameState_TowerDefence.h"
 #include "Monster/MonsterAIController.h"
 #include "Monster/MonsterAsset.h"
+#include "GameModes/GameModeBase_TowerDefence.h"
 #include "Components/CapsuleComponent.h"
 
 AMonsterBase_TowerDefence::AMonsterBase_TowerDefence()
@@ -58,6 +59,7 @@ void AMonsterBase_TowerDefence::SetupAsset(const UMonsterAsset* InMonsterAsset)
 
 	Health = InMonsterAsset->Health;
 	Speed = InMonsterAsset->Speed;
+	Score = 10;
 }
 
 void AMonsterBase_TowerDefence::SetupSplinePath(TWeakObjectPtr<const USplineComponent> pSplinePath)
@@ -81,6 +83,11 @@ float AMonsterBase_TowerDefence::TakeDamage(float DamageAmount, FDamageEvent con
 	Health -= finalDamage;
 	if (Health <= 0.f)
 	{
+		if (HasAuthority())
+		{
+			GetWorld()->GetAuthGameMode<AGameModeBase_TowerDefence>()->AddScore(EventInstigator, Score);
+		}
+
 		Destroy();
 	}
 
