@@ -33,9 +33,6 @@ public:
 	void DecreaseMonster();
 
 protected:
-	// GameState Interface
-	// ~GameState Interface
-
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION()

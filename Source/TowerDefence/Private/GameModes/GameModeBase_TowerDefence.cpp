@@ -165,5 +165,8 @@ void AGameModeBase_TowerDefence::AddScore(AController* EventInstigator, int32 iS
 		return;
 	}
 
-	EventInstigator->GetPlayerState<APlayerState_TowerDefence>()->AddScore(iScore);
+	if (APlayerState_TowerDefence* pPlayerState = EventInstigator->GetPlayerState<APlayerState_TowerDefence>())
+	{
+		pPlayerState->AddScore(iScore);
+	}
 }
