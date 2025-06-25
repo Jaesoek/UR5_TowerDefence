@@ -42,6 +42,11 @@ void APlayerController_TowerDefence::SetupInputComponent()
 
 void APlayerController_TowerDefence::HandelMoveTo(const FInputActionValue& Value)
 {
+	if (false == IsLocalController())	// Key input works only in client
+	{
+		return;
+	}
+
 	FHitResult HitResult;
 	GetHitResultUnderCursor(ECC_Camera, false, HitResult);
 	if (!HitResult.bBlockingHit)
@@ -57,6 +62,11 @@ void APlayerController_TowerDefence::HandelMoveTo(const FInputActionValue& Value
 
 void APlayerController_TowerDefence::HandleSelectActor(const FInputActionValue& Value)
 {
+	if (false == IsLocalController())	// Key input works only in client
+	{
+		return;
+	}
+
 	FHitResult HitResult;
 	GetHitResultUnderCursor(ECC_Camera, false, HitResult);
 	if (!HitResult.bBlockingHit)
@@ -81,6 +91,11 @@ void APlayerController_TowerDefence::HandleSelectActor(const FInputActionValue& 
 
 void APlayerController_TowerDefence::HandelBuild(const FInputActionValue& Value)
 {
+	if (false == IsLocalController())	// Key input works only in client
+	{
+		return;
+	}
+
 	FHitResult HitResult;
 	GetHitResultUnderCursor(ECC_Camera, false, HitResult);
 	if (!HitResult.bBlockingHit)
@@ -114,7 +129,7 @@ void APlayerController_TowerDefence::Server_SpawnTower_Implementation(FVector vS
 	ATowerBase* pTower = GetWorld()->SpawnActorDeferred<ATowerBase>(
 		ATowerBase::StaticClass(), targetTrans, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn
 	);
-	pTower->SetTowerAsset(ArrayTowerAssets[0]);
+	pTower->SetupAsset(ArrayTowerAssets[0]);
 	pTower->SetReplicates(true);
 	UGameplayStatics::FinishSpawningActor(pTower, targetTrans);
 }

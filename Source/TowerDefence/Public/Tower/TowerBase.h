@@ -17,23 +17,27 @@ public:
 	ATowerBase();
 
 protected:
-	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<class USkeletalMeshComponent> m_SKMesh;
+	UFUNCTION()
+	void OnRep_TowerAsset();
+
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_TowerAsset)
+	TObjectPtr<UTowerAsset> TowerAsset;
+
+	UPROPERTY(Transient, Replicated)
+	TObjectPtr<class UAnimMontage> MontageAttack;
 
 	UPROPERTY(Transient)
-	TObjectPtr<UTowerAsset> m_TowerAsset;
+	TObjectPtr<class USkeletalMeshComponent> SKMesh;
 
 	UPROPERTY(Transient)
 	float m_fAttackRange;
 
 public:
-	FORCEINLINE void SetTowerAsset(TObjectPtr<UTowerAsset> towerAsset)
-	{
-		m_TowerAsset = towerAsset;
-	}
+	void SetupAsset(TObjectPtr<UTowerAsset> towerAsset);
+
 	FORCEINLINE float GetAttackRange() const
 	{
 		return m_fAttackRange;

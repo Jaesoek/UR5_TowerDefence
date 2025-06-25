@@ -7,6 +7,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Monster/MonsterBase_TowerDefence.h"
+#include "Net/UnrealNetwork.h"
 
 ATowerBase::ATowerBase()
 	: m_fAttackRange(0.0)
@@ -35,29 +36,12 @@ ATowerBase::ATowerBase()
 		RootComponent = pCapsule;
 	}
 
-	m_SKMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
-	if (m_SKMesh)
+	SKMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
+	if (SKMesh)
 	{
-		m_SKMesh->SetupAttachment(RootComponent);
-		m_SKMesh->SetRelativeLocation(FVector(0.f, 0.f, -fHalfHeight));
-		m_SKMesh->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
-	}
-}
-
-void ATowerBase::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-
-	if (IsValid(m_SKMesh) && IsValid(m_TowerAsset))	// Set mesh infoes
-	{
-		if (false == m_TowerAsset->TowerMesh.IsValid())
-		{
-			m_TowerAsset->TowerMesh.LoadSynchronous();
-		}
-		m_SKMesh->SetSkeletalMeshAsset(m_TowerAsset->TowerMesh.Get());
-		m_SKMesh->SetAnimInstanceClass(m_TowerAsset->AnimInstance);
-
-		m_fAttackRange = m_TowerAsset->AttackRange;
+		SKMesh->SetupAttachment(RootComponent);
+		SKMesh->SetRelativeLocation(FVector(0.f, 0.f, -fHalfHeight));
+		SKMesh->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 	}
 }
 
@@ -71,10 +55,10 @@ void ATowerBase::BeginPlay()
 	{
 		if (Controller == nullptr)
 		{
-			if (m_TowerAsset->AI_Controller)
+			if (TowerAsset->AI_Controller)
 			{
 				AAIController* AIController = GetWorld()->SpawnActor<AAIController>(
-					m_TowerAsset->AI_Controller, GetActorLocation(), GetActorRotation());
+					TowerAsset->AI_Controller, GetActorLocation(), GetActorRotation());
 				if (AIController)
 				{
 					AIController->Possess(this);
@@ -84,16 +68,56 @@ void ATowerBase::BeginPlay()
 	}
 }
 
+void ATowerBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ATowerBase, TowerAsset);
+	DOREPLIFETIME(ATowerBase, MontageAttack);
+}
+
+void ATowerBase::OnRep_TowerAsset()
+{
+	if (IsValid(SKMesh) && IsValid(TowerAsset))	// Set mesh infoes
+	{
+		if (false == TowerAsset->TowerMesh.IsValid())
+		{
+			TowerAsset->TowerMesh.LoadSynchronous();
+		}
+		SKMesh->SetSkeletalMeshAsset(TowerAsset->TowerMesh.Get());
+		SKMesh->SetAnimInstanceClass(TowerAsset->AnimInstance);
+
+		m_fAttackRange = TowerAsset->AttackRange;
+	}
+}
+
+void ATowerBase::SetupAsset(TObjectPtr<UTowerAsset> towerAsset)
+{
+	if (HasAuthority())
+	{
+		TowerAsset = towerAsset;
+
+		SKMesh->SetAnimInstanceClass(TowerAsset->AnimInstance);
+		m_fAttackRange = TowerAsset->AttackRange;
+
+		if (false == TowerAsset->MontageAttack.IsValid())
+		{
+			TowerAsset->MontageAttack.LoadSynchronous();
+		}
+		MontageAttack = TowerAsset->MontageAttack.Get();
+	}
+}
+
 bool ATowerBase::Attack(AActor* pTarget)
 {
-	if (!m_TowerAsset)
+	if (false == HasAuthority())
 	{
 		return false;
 	}
 
-	if (IsValid(pTarget) && IsValid(m_TowerAsset->AttackMontage) && !m_SKMesh->GetAnimInstance()->Montage_IsPlaying(m_TowerAsset->AttackMontage))
+	if (IsValid(pTarget) && IsValid(MontageAttack) && !SKMesh->GetAnimInstance()->Montage_IsPlaying(MontageAttack))
 	{
-		m_SKMesh->GetAnimInstance()->Montage_Play(m_TowerAsset->AttackMontage);
+		SKMesh->GetAnimInstance()->Montage_Play(MontageAttack);
 		pTarget->TakeDamage(10.f, FPointDamageEvent{}, GetController(), this);
 		return true;
 	}

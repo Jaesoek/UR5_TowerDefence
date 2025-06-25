@@ -34,5 +34,5 @@ public:
 	TSubclassOf<UAnimInstance> AnimInstance;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tower Mesh")
-	TObjectPtr<UAnimMontage> AttackMontage;
+	TSoftObjectPtr<UAnimMontage> MontageAttack;
 };
