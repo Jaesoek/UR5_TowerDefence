@@ -4,6 +4,8 @@
 #include "Monster/MonsterAsset.h"
 #include "GameModes/GameModeBase_TowerDefence.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/FloatingPawnMovement.h"
+#include "Net/UnrealNetwork.h"
 
 AMonsterBase_TowerDefence::AMonsterBase_TowerDefence()
 	: Health(0.f), Speed(0.f), m_fTargetDistance(0.f), m_fCurDistance(0.f)
@@ -25,6 +27,7 @@ AMonsterBase_TowerDefence::AMonsterBase_TowerDefence()
 		pCapsule->SetCollisionResponseToAllChannels(ECR_Block);
 		pCapsule->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
 		pCapsule->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+		pCapsule->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 
 		pCapsule->InitCapsuleSize(30.f, fHalfHeight);
 		pCapsule->SetRelativeLocation(FVector(0.f, 0.f, fHalfHeight));
@@ -41,27 +44,46 @@ AMonsterBase_TowerDefence::AMonsterBase_TowerDefence()
 		SkeletalMeshComponent->SetRelativeLocation(FVector{ 0.f, 0.f, -fHalfHeight });
 		SkeletalMeshComponent->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 	}
+
+	MovementComp = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
+	MovementComp->SetIsReplicated(true);
 }
 
-void AMonsterBase_TowerDefence::SetupAsset(const UMonsterAsset* InMonsterAsset)
+void AMonsterBase_TowerDefence::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	if (!IsValid(InMonsterAsset))
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AMonsterBase_TowerDefence, MonsterAsset);
+	DOREPLIFETIME(AMonsterBase_TowerDefence, Health);
+}
+
+void AMonsterBase_TowerDefence::OnRep_MonsterAsset()
+{
+	if (MonsterAsset->MonsterMesh.ToSoftObjectPath().IsValid())
 	{
-		return;
-	}
-	
-	if (InMonsterAsset->MonsterMesh.ToSoftObjectPath().IsValid())
-	{
-		USkeletalMesh* SkelMesh = InMonsterAsset->MonsterMesh.LoadSynchronous();
+		USkeletalMesh* SkelMesh = MonsterAsset->MonsterMesh.LoadSynchronous();
 		if (IsValid(SkelMesh))
 		{
 			SkeletalMeshComponent->SetSkeletalMesh(SkelMesh);
 		}
 	}
+}
 
-	Health = InMonsterAsset->Health;
-	Speed = InMonsterAsset->Speed;
-	Score = 10;
+void AMonsterBase_TowerDefence::SetupAsset(TObjectPtr<UMonsterAsset> InMonsterAsset)
+{
+	if (!IsValid(InMonsterAsset))
+	{
+		return;
+	}
+
+	if (HasAuthority())
+	{
+		MonsterAsset = InMonsterAsset;
+
+		Health = MonsterAsset->Health;
+		Speed = MonsterAsset->Speed;
+		Score = 10;
+	}
 }
 
 void AMonsterBase_TowerDefence::SetupSplinePath(TWeakObjectPtr<const USplineComponent> pSplinePath)
@@ -100,19 +122,21 @@ void AMonsterBase_TowerDefence::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (SplinePath.IsValid())
+	if (HasAuthority())
 	{
-		m_fCurDistance += Speed * DeltaSeconds;
-		if (m_fCurDistance >= m_fTargetDistance)
+		if (SplinePath.IsValid())
 		{
-			Attack();
-		}
-		else
-		{
-			const FVector&& vCurLocation = SplinePath->GetLocationAtDistanceAlongSpline(m_fCurDistance, ESplineCoordinateSpace::Type::World);
-			const FRotator&& vCurRotator = SplinePath->GetRotationAtDistanceAlongSpline(m_fCurDistance, ESplineCoordinateSpace::Type::World);
-			SetActorLocation(vCurLocation);
-			SetActorRotation(vCurRotator);
+			m_fCurDistance += Speed * DeltaSeconds;
+			if (m_fCurDistance >= m_fTargetDistance)
+			{
+				Attack();
+			}
+			else
+			{
+				const FVector&& vCurLocation = SplinePath->GetLocationAtDistanceAlongSpline(m_fCurDistance, ESplineCoordinateSpace::Type::World);
+				FVector Direction = (vCurLocation - GetActorLocation()).GetSafeNormal();
+				MovementComp->AddInputVector(Direction * Speed);	// MovementComponent가 알아서 Velocity 처리
+			}
 		}
 	}
 }

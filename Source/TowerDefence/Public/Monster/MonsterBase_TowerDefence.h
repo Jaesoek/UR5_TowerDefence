@@ -3,21 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "GameFramework/Pawn.h"
 #include "Components/SplineComponent.h"
 #include "MonsterBase_TowerDefence.generated.h"
 
 class UMonsterAsset;
+class UFloatingPawnMovement;
 
 UCLASS()
-class TOWERDEFENCE_API AMonsterBase_TowerDefence : public ACharacter
+class TOWERDEFENCE_API AMonsterBase_TowerDefence : public APawn
 {
 	GENERATED_BODY()
 
 public:
 	AMonsterBase_TowerDefence();
 
-	virtual void SetupAsset(const UMonsterAsset* InMonsterAsset);
+	virtual void SetupAsset(TObjectPtr<UMonsterAsset> InMonsterAsset);
 	virtual void SetupSplinePath(TWeakObjectPtr<const USplineComponent> pSplinePath);
 
 protected:
@@ -26,10 +27,22 @@ protected:
 	virtual void Destroyed() override;
 	virtual void Attack();
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UFUNCTION()
+	void OnRep_MonsterAsset();
+
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UFloatingPawnMovement> MovementComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats", ReplicatedUsing = OnRep_MonsterAsset)
+	TObjectPtr<UMonsterAsset> MonsterAsset;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats", Replicated)
 	float Health;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats")

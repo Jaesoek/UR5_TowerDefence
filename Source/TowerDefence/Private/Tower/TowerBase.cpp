@@ -109,14 +109,16 @@ void ATowerBase::SetupAsset(TObjectPtr<UTowerAsset> towerAsset)
 
 bool ATowerBase::Attack(AActor* pTarget)
 {
+	if (IsValid(pTarget))
+		return false;
+
 	if (HasAuthority())
 	{
 		MulticastPlayAttackAnim(pTarget);
 
 		pTarget->TakeDamage(10.f, FPointDamageEvent{}, GetController(), this);
 	}
-
-	return false;
+	return true;
 }
 
 void ATowerBase::MulticastPlayAttackAnim_Implementation(AActor* pTarget)
