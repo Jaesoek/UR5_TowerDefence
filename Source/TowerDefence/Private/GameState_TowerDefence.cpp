@@ -18,6 +18,7 @@ void AGameState_TowerDefence::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 
 	DOREPLIFETIME(AGameState_TowerDefence, m_iCurLevel);
 	DOREPLIFETIME(AGameState_TowerDefence, m_curRoundState);
+	DOREPLIFETIME(AGameState_TowerDefence, m_iRemainNum_Monsters);
 }
 
 void AGameState_TowerDefence::OnRep_RoundState()
@@ -37,6 +38,11 @@ void AGameState_TowerDefence::OnRep_RoundState()
 		}
 		break;
 	}
+}
+
+void AGameState_TowerDefence::OnRep_MonsterNum()
+{
+	OnMonsterNumChanged.Broadcast(m_iRemainNum_Monsters);
 }
 
 void AGameState_TowerDefence::SetGameState(ERoundState InRoundState)
@@ -62,21 +68,11 @@ void AGameState_TowerDefence::SetGameState(ERoundState InRoundState)
 	}
 }
 
-void AGameState_TowerDefence::SetMonsterNum(int32 iNumMonsters)
-{
-	if (HasAuthority())
-	{
-		m_iRemainNum_Monsters = iNumMonsters;
-		OnMonsterNumChanged.Broadcast(m_iRemainNum_Monsters);
-	}
-}
-
 void AGameState_TowerDefence::AddMonster()
 {
 	if (HasAuthority())
 	{
 		++m_iRemainNum_Monsters;
-		OnMonsterNumChanged.Broadcast(m_iRemainNum_Monsters);
 	}
 }
 
@@ -85,11 +81,10 @@ void AGameState_TowerDefence::DecreaseMonster()
 	if (HasAuthority())
 	{
 		--m_iRemainNum_Monsters;
-		OnMonsterNumChanged.Broadcast(m_iRemainNum_Monsters);
-	}
 
-	if (m_iRemainNum_Monsters == 0)
-	{
-		// TODO: Stage finish
+		if (m_iRemainNum_Monsters == 0)
+		{
+			// TODO: Stage finish
+		}
 	}
 }

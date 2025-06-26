@@ -28,7 +28,6 @@ public:
 	FORCEINLINE virtual int32 GetCurrentLevel() { return m_iCurLevel; }
 
 	int32 GetMonsterNum() const { return m_iRemainNum_Monsters; }
-	void SetMonsterNum(int32 iNumMonsters);
 	void AddMonster();
 	void DecreaseMonster();
 
@@ -38,13 +37,16 @@ protected:
 	UFUNCTION()
 	void OnRep_RoundState();
 
+	UFUNCTION()
+	void OnRep_MonsterNum();
+
 	UPROPERTY(Transient, Replicated)
 	int32 m_iCurLevel;
 
 	UPROPERTY(Transient, Replicated, ReplicatedUsing = OnRep_RoundState)
 	ERoundState m_curRoundState;
 
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, Replicated, ReplicatedUsing = OnRep_MonsterNum)
 	int32 m_iRemainNum_Monsters;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Round Rule Setting")
