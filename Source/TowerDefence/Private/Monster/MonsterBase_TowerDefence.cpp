@@ -10,6 +10,8 @@ AMonsterBase_TowerDefence::AMonsterBase_TowerDefence()
 {
 	PrimaryActorTick.bCanEverTick = true; // ���� �Ⱦ��� ��Ȱ��ȭ
 
+	bReplicates = true;
+
 	AIControllerClass = AMonsterAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 

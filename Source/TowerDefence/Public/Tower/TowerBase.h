@@ -27,29 +27,34 @@ protected:
 	TObjectPtr<UTowerAsset> TowerAsset;
 
 	UPROPERTY(Transient, Replicated)
+	bool IsAttackable;
+
+	UPROPERTY(Transient)
+	float AttackRange;
+
+	UPROPERTY(Transient)
 	TObjectPtr<class UAnimMontage> MontageAttack;
 
 	UPROPERTY(Transient)
 	TObjectPtr<class USkeletalMeshComponent> SKMesh;
 
-	UPROPERTY(Transient)
-	float m_fAttackRange;
 
 public:
 	void SetupAsset(TObjectPtr<UTowerAsset> towerAsset);
 
 	FORCEINLINE float GetAttackRange() const
 	{
-		return m_fAttackRange;
+		return AttackRange;
 	}
 	FORCEINLINE float GetAttackRangeSqud() const
 	{
-		return m_fAttackRange * m_fAttackRange;
+		return AttackRange * AttackRange;
 	}
 
 	virtual bool Attack(AActor* pTarget) final;
 
-	virtual void FollowTo(FVector& vTargetPos) final;	// 임시: 로직정리되면 지울게요
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastPlayAttackAnim(AActor* pTarget);	// TODO: Need discussion
 
 private:
 	virtual void OnFocused() override;

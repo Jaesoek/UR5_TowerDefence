@@ -10,7 +10,7 @@
 #include "Net/UnrealNetwork.h"
 
 ATowerBase::ATowerBase()
-	: m_fAttackRange(0.0)
+	: IsAttackable(true), AttackRange(0.0)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
@@ -73,7 +73,7 @@ void ATowerBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ATowerBase, TowerAsset);
-	DOREPLIFETIME(ATowerBase, MontageAttack);
+	DOREPLIFETIME(ATowerBase, IsAttackable);
 }
 
 void ATowerBase::OnRep_TowerAsset()
@@ -87,7 +87,13 @@ void ATowerBase::OnRep_TowerAsset()
 		SKMesh->SetSkeletalMeshAsset(TowerAsset->TowerMesh.Get());
 		SKMesh->SetAnimInstanceClass(TowerAsset->AnimInstance);
 
-		m_fAttackRange = TowerAsset->AttackRange;
+		if (false == TowerAsset->MontageAttack.IsValid())
+		{
+			TowerAsset->MontageAttack.LoadSynchronous();
+		}
+		MontageAttack = TowerAsset->MontageAttack.Get();
+
+		AttackRange = TowerAsset->AttackRange;
 	}
 }
 
@@ -97,45 +103,28 @@ void ATowerBase::SetupAsset(TObjectPtr<UTowerAsset> towerAsset)
 	{
 		TowerAsset = towerAsset;
 
-		SKMesh->SetAnimInstanceClass(TowerAsset->AnimInstance);
-		m_fAttackRange = TowerAsset->AttackRange;
-
-		if (false == TowerAsset->MontageAttack.IsValid())
-		{
-			TowerAsset->MontageAttack.LoadSynchronous();
-		}
-		MontageAttack = TowerAsset->MontageAttack.Get();
+		AttackRange = TowerAsset->AttackRange;
 	}
 }
 
 bool ATowerBase::Attack(AActor* pTarget)
 {
-	if (false == HasAuthority())
+	if (HasAuthority())
 	{
-		return false;
-	}
+		MulticastPlayAttackAnim(pTarget);
 
-	if (IsValid(pTarget) && IsValid(MontageAttack) && !SKMesh->GetAnimInstance()->Montage_IsPlaying(MontageAttack))
-	{
-		SKMesh->GetAnimInstance()->Montage_Play(MontageAttack);
 		pTarget->TakeDamage(10.f, FPointDamageEvent{}, GetController(), this);
-		return true;
 	}
 
 	return false;
 }
 
-void ATowerBase::FollowTo(FVector& vTargetPos)
+void ATowerBase::MulticastPlayAttackAnim_Implementation(AActor* pTarget)
 {
-	//if (m_eStatus != ETowerState::STATE_READY)
-	//{
-	//	return;
-	//}
-
-	//if ((vTargetPos - GetActorLocation()).SizeSquared() > 2.f)
-	//{
-	//	SetActorLocation(vTargetPos);
-	//}
+	if (IsValid(pTarget) && IsValid(MontageAttack) && !SKMesh->GetAnimInstance()->Montage_IsPlaying(MontageAttack))
+	{
+		SKMesh->GetAnimInstance()->Montage_Play(MontageAttack);
+	}
 }
 
 void ATowerBase::OnFocused()
