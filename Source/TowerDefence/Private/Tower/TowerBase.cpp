@@ -109,7 +109,7 @@ void ATowerBase::SetupAsset(TObjectPtr<UTowerAsset> towerAsset)
 
 bool ATowerBase::Attack(AActor* pTarget)
 {
-	if (IsValid(pTarget))
+	if (false == IsValid(pTarget))
 		return false;
 
 	if (HasAuthority())

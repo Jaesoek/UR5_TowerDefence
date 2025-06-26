@@ -51,10 +51,13 @@ public:
 		return AttackRange * AttackRange;
 	}
 
+	// TODO: Need discussion
+	//  About sync between montage and takedamage
 	virtual bool Attack(AActor* pTarget) final;
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastPlayAttackAnim(AActor* pTarget);	// TODO: Need discussion
+	void MulticastPlayAttackAnim(AActor* pTarget);
+	// ~Need discussion
 
 private:
 	virtual void OnFocused() override;
