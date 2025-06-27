@@ -8,6 +8,8 @@
 #include "Tower/TowerBase.h"
 #include "PlayerController_TowerDefence.generated.h"
 
+class IControlUnit;
+
 UCLASS()
 class TOWERDEFENCE_API APlayerController_TowerDefence : public APlayerController
 {
@@ -26,6 +28,9 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void Server_SpawnTower(FVector vSpawnPos);
+
+	UFUNCTION(Server, Reliable)
+	void Server_MoveControlUnit(AActor* pControlUnit, FVector vTargetPos);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input Mode")
@@ -49,5 +54,5 @@ protected:
 
 
 private:
-	TScriptInterface<class IControlUnit>	m_pControlUnit;
+	TScriptInterface<IControlUnit>	m_pControlUnit;
 };

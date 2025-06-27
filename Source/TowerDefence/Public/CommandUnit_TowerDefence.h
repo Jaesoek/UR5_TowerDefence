@@ -13,7 +13,6 @@ class TOWERDEFENCE_API ACommandUnit_TowerDefence : public ACharacter, public ICo
 public:
 	ACommandUnit_TowerDefence();
 
-public:
 	virtual void OnFocused() override;
 	virtual void OnMoveTo(const FVector& vTargetPos) override;
 };

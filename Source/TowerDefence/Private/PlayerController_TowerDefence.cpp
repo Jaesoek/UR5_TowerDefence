@@ -56,7 +56,8 @@ void APlayerController_TowerDefence::HandelMoveTo(const FInputActionValue& Value
 
 	if (IsValid(m_pControlUnit.GetObject()))
 	{
-		m_pControlUnit->OnMoveTo(HitResult.Location);
+		// No owner object can be controlled by server - 중요!
+		Server_MoveControlUnit(Cast<AActor>(m_pControlUnit.GetObject()), HitResult.Location);
 	}
 }
 
@@ -132,4 +133,18 @@ void APlayerController_TowerDefence::Server_SpawnTower_Implementation(FVector vS
 	pTower->SetupAsset(ArrayTowerAssets[0]);
 	pTower->SetReplicates(true);
 	UGameplayStatics::FinishSpawningActor(pTower, targetTrans);
+}
+
+void APlayerController_TowerDefence::Server_MoveControlUnit_Implementation(AActor* pControlUnit, FVector vTargetPos)
+{
+	if (IControlUnit* ControlUnit = Cast<IControlUnit>(pControlUnit))
+	{
+		ControlUnit->OnMoveTo(vTargetPos);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(
+			-1, 1.f, FColor::Green, FString::Printf(TEXT("No nono"))
+		);
+	}
 }
