@@ -22,12 +22,29 @@ public:
 protected:
 	virtual void PostLoad() override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UFUNCTION()
+	void OnRep_ScoreEdit();
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Info")
 	int32 MaxHealth;
 
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_ScoreEdit)
 	int32 CurScore;
 
 	UPROPERTY(Transient)
 	int32 CurHealth;
+
+
+protected:
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnScoreChanged, int32)
+	FOnScoreChanged OnScoreChanged;
+
+public:
+	template <typename UserClass>
+	void RegistEvent_ScoreChanged(UserClass* InObject, typename TMemFunPtrType<false, UserClass, void(int32)>::Type InFunc)
+	{
+		OnScoreChanged.AddUObject(InObject, InFunc);
+	}
 };

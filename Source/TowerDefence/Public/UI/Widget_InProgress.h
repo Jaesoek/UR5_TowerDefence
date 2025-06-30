@@ -18,6 +18,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Custom Info")
 	int32 m_iRemainNum;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Custom Info")
+	int32 m_iCurScore;
+
 protected:
 	virtual void MonsterNumChanged(int32 iRemainNum) final;
+	virtual void ScoreChanged(int32 iCurScore) final;
 };
