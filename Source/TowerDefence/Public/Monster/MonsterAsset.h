@@ -25,6 +25,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Visible")
 	TSoftObjectPtr<USkeletalMesh> MonsterMesh;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+	TSubclassOf<UAnimInstance> AnimInstance;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+	TSoftObjectPtr<UAnimMontage> MontageHit;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Stats")
 	int Health;
 

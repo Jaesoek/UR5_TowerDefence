@@ -65,7 +65,22 @@ void AMonsterBase_TowerDefence::OnRep_MonsterAsset()
 		if (IsValid(SkelMesh))
 		{
 			SkeletalMeshComponent->SetSkeletalMesh(SkelMesh);
+			SkeletalMeshComponent->SetAnimInstanceClass(MonsterAsset->AnimInstance);
 		}
+
+		if (MonsterAsset->MontageHit.IsValid())
+		{
+			MonsterAsset->MontageHit.LoadSynchronous();
+			MontageHit = MonsterAsset->MontageHit.Get();
+		}
+	}
+}
+
+void AMonsterBase_TowerDefence::OnRep_Damaged()
+{
+	if (IsValid(MontageHit) && !SkeletalMeshComponent->GetAnimInstance()->Montage_IsPlaying(MontageHit))
+	{
+		SkeletalMeshComponent->GetAnimInstance()->Montage_Play(MontageHit);
 	}
 }
 
@@ -102,6 +117,11 @@ void AMonsterBase_TowerDefence::SetupSplinePath(TWeakObjectPtr<const USplineComp
 
 float AMonsterBase_TowerDefence::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	if (false == HasAuthority())
+	{
+		return 0.f;
+	}
+
 	float finalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	Health -= finalDamage;
@@ -135,7 +155,27 @@ void AMonsterBase_TowerDefence::Tick(float DeltaSeconds)
 			{
 				const FVector&& vCurLocation = SplinePath->GetLocationAtDistanceAlongSpline(m_fCurDistance, ESplineCoordinateSpace::Type::World);
 				FVector Direction = (vCurLocation - GetActorLocation()).GetSafeNormal();
-				MovementComp->AddInputVector(Direction * Speed);	// MovementComponent가 알아서 Velocity 처리
+				MovementComp->AddInputVector(Direction * Speed);
+
+				FVector Velocity = GetVelocity();
+				Velocity.Z = 0.f;
+				if (!Velocity.IsNearlyZero())
+				{
+					FRotator CurrentRotation = GetActorRotation();
+					FRotator TargetRotation = Velocity.ToOrientationRotator();
+
+					FRotator NewRotation;
+					const float RotationTolerance = 1.0f;
+					if (CurrentRotation.Equals(TargetRotation, RotationTolerance))
+					{
+						NewRotation = TargetRotation;
+					}
+					else
+					{
+						NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaSeconds, 10.f);
+					}
+					SetActorRotation(NewRotation);
+				}
 			}
 		}
 	}

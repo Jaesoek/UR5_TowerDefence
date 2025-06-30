@@ -32,6 +32,8 @@ protected:
 	UFUNCTION()
 	void OnRep_MonsterAsset();
 
+	UFUNCTION()
+	void OnRep_Damaged();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
@@ -39,10 +41,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UFloatingPawnMovement> MovementComp;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
+	TObjectPtr<UAnimMontage> MontageHit;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats", ReplicatedUsing = OnRep_MonsterAsset)
 	TObjectPtr<UMonsterAsset> MonsterAsset;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats", Replicated)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats", Replicated, ReplicatedUsing = OnRep_Damaged)
 	float Health;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats")
