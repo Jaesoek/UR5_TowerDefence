@@ -5,6 +5,8 @@
 #include "GameModes/GameModeBase_TowerDefence.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "PlayerController_TowerDefence.h"
+#include "Player/PlayerState_TowerDefence.h"
 #include "Net/UnrealNetwork.h"
 
 AMonsterBase_TowerDefence::AMonsterBase_TowerDefence()
@@ -123,13 +125,13 @@ float AMonsterBase_TowerDefence::TakeDamage(float DamageAmount, FDamageEvent con
 	}
 
 	float finalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-
 	Health -= finalDamage;
 	if (Health <= 0.f)
 	{
-		if (HasAuthority())
+		if (APlayerController_TowerDefence* pPlayerControl = Cast<APlayerController_TowerDefence>(EventInstigator))
 		{
-			GetWorld()->GetAuthGameMode<AGameModeBase_TowerDefence>()->AddScore(EventInstigator, Score);
+			APlayerState_TowerDefence* pPlayerState = pPlayerControl->GetPlayerState<APlayerState_TowerDefence>();
+			pPlayerState->AddScore(Score);
 		}
 
 		Destroy();

@@ -7,6 +7,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Monster/MonsterBase_TowerDefence.h"
+#include "PlayerController_TowerDefence.h"
 #include "Net/UnrealNetwork.h"
 
 ATowerBase::ATowerBase()
@@ -17,7 +18,7 @@ ATowerBase::ATowerBase()
 
 	bUseControllerRotationYaw = true;
 
-	const float fHalfHeight = 50.f;	// Only for init
+	const float fHalfHeight = 50.f;	// Only for init // TODO: 피드백
 
 	UCapsuleComponent* pCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("RootComp"));
 	if (pCapsule)
@@ -53,6 +54,7 @@ void ATowerBase::BeginPlay()
 
 	if (HasAuthority())	// Self possess, only server side
 	{
+		AActor* pExpectedOwner = GetOwner();
 		if (Controller == nullptr)
 		{
 			if (TowerAsset->AI_Controller)
@@ -62,6 +64,7 @@ void ATowerBase::BeginPlay()
 				if (AIController)
 				{
 					AIController->Possess(this);
+					SetOwner(pExpectedOwner);	// when possess work, owner covered - 중요!
 				}
 			}
 		}
@@ -112,11 +115,10 @@ bool ATowerBase::Attack(AActor* pTarget)
 	if (false == IsValid(pTarget))
 		return false;
 
-	if (HasAuthority())
+	if (HasAuthority())	// TODO: 피드백
 	{
 		MulticastPlayAttackAnim(pTarget);
-
-		pTarget->TakeDamage(10.f, FPointDamageEvent{}, GetController(), this);
+		pTarget->TakeDamage(10.f, FPointDamageEvent{}, Cast<APlayerController_TowerDefence>(GetOwner()), this);
 	}
 	return true;
 }

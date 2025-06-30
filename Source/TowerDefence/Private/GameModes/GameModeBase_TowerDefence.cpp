@@ -157,16 +157,3 @@ void AGameModeBase_TowerDefence::SpawnFinish()
 
 	// TODO: 시간 기다렸다가 Finish 호출하기
 }
-
-void AGameModeBase_TowerDefence::AddScore(AController* EventInstigator, int32 iScore)
-{
-	if (!IsValid(EventInstigator))
-	{
-		return;
-	}
-
-	if (APlayerState_TowerDefence* pPlayerState = EventInstigator->GetPlayerState<APlayerState_TowerDefence>())
-	{
-		pPlayerState->AddScore(iScore);
-	}
-}

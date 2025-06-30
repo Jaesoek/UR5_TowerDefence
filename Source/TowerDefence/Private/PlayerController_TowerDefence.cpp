@@ -128,7 +128,7 @@ void APlayerController_TowerDefence::Server_SpawnTower_Implementation(FVector vS
 
 	FTransform targetTrans = FTransform{ FRotator::ZeroRotator, vSpawnPos, FVector::One() };
 	ATowerBase* pTower = GetWorld()->SpawnActorDeferred<ATowerBase>(
-		ATowerBase::StaticClass(), targetTrans, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn
+		ATowerBase::StaticClass(), targetTrans, this, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn
 	);
 	pTower->SetupAsset(ArrayTowerAssets[0]);
 	pTower->SetReplicates(true);
