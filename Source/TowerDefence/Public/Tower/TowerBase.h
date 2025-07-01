@@ -3,21 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Tower/TowerInclude.h"
 #include "GameFramework/Pawn.h"
 #include "ControlUnit.h"
 #include "Tower/TowerAsset.h"
 #include "TowerBase.generated.h"
 
-UENUM()
-enum class ETowerState : uint8
-{
-	IDLE, ATTACK, MAX
-};
 
 UCLASS()
 class TOWERDEFENCE_API ATowerBase : public APawn, public IControlUnit
 {
 	GENERATED_BODY()
+
+friend class UTowerAttackComponent;
 
 public:
 	ATowerBase();
@@ -56,6 +54,9 @@ protected:
 	UPROPERTY(Transient)
 	TObjectPtr<class USkeletalMeshComponent> SKMesh;
 
+	UPROPERTY(Transient)
+	TObjectPtr<UTowerAttackComponent> AttackComp;
+
 
 public:
 	void SetupAsset(TObjectPtr<UTowerAsset> towerAsset);
@@ -68,10 +69,19 @@ public:
 	{
 		return AttackRange * AttackRange;
 	}
+	FORCEINLINE ETowerState GetCurrentState() const
+	{
+		return CurState;
+	}
+	FORCEINLINE float GetAttackCoolTime() const
+	{
+		return AttackCoolTime;
+	}
 
 	virtual bool Attack(AActor* pTarget) final;
+	virtual void Attack_CoolDown() final;
+	virtual void TakeDamage(AActor* pTarget) final;
 
 private:
 	virtual void OnFocused() override;
-	virtual void OnMoveTo(const FVector& vTargetPos) override;
 };

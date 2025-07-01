@@ -8,6 +8,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Monster/MonsterBase_TowerDefence.h"
 #include "PlayerController_TowerDefence.h"
+#include "Tower/TowerAttackComponent.h"
 #include "Net/UnrealNetwork.h"
 
 #include "Utils/TDLogChannel.h"
@@ -102,16 +103,17 @@ void ATowerBase::OnRep_TowerAsset()
 {
 	if (IsValid(SKMesh) && IsValid(TowerAsset))	// Set mesh infoes
 	{
-		if (TowerAsset->TowerMesh.IsValid())
+		if (TowerAsset->TowerMesh.ToSoftObjectPath().IsValid())
 		{
 			TowerAsset->TowerMesh.LoadSynchronous();
 			SKMesh->SetSkeletalMeshAsset(TowerAsset->TowerMesh.Get());
 		}
 		SKMesh->SetAnimInstanceClass(TowerAsset->AnimInstance);
 
-		if (TowerAsset->MontageAttack.IsValid())
+		if (TowerAsset->MontageAttack.ToSoftObjectPath().IsValid())
 		{
-			MontageAttack = TowerAsset->MontageAttack.LoadSynchronous();
+			TowerAsset->MontageAttack.LoadSynchronous();
+			MontageAttack = TowerAsset->MontageAttack.Get();
 		}
 
 		AttackCoolTime = TowerAsset->AttackCoolTime;
@@ -140,9 +142,17 @@ void ATowerBase::OnRep_StateChanged()
 
 void ATowerBase::SetupAsset(TObjectPtr<UTowerAsset> towerAsset)
 {
+	if (false == IsValid(towerAsset))
+	{
+		return;
+	}
+
 	if (HasAuthority())
 	{
 		TowerAsset = towerAsset;
+
+		AttackComp = NewObject<UTowerAttackComponent>(this, TowerAsset->AttackCompClass);
+		AttackComp->RegisterComponent();
 
 		AttackRange = TowerAsset->AttackRange;
 		AttackCoolTime = TowerAsset->AttackCoolTime;
@@ -151,44 +161,43 @@ void ATowerBase::SetupAsset(TObjectPtr<UTowerAsset> towerAsset)
 
 bool ATowerBase::Attack(AActor* pTarget)
 {
-	if (false == IsValid(pTarget))
-	{
-		return false;
-	}
-	if (AttackCoolTime == 0.f)
+	if (false == IsValid(AttackComp))
 	{
 		return false;
 	}
 
+	return AttackComp->Attack(pTarget);
+}
+
+void ATowerBase::Attack_CoolDown()
+{
 	if (HasAuthority())
 	{
-		if (ETowerState::ATTACK != CurState)
-		{
-			SetState(ETowerState::ATTACK);
-			pTarget->TakeDamage(10.f, FPointDamageEvent{}, Cast<APlayerController_TowerDefence>(GetOwner()), this);
-
-			// Cool down timer
-			GetWorldTimerManager().SetTimer(
-				TimerCoolDown,
-				this,
-				&ThisClass::OnAttackFinish,
-				AttackCoolTime,
-				false,
-				AttackCoolTime
-			);
-
-			return true;
-		}
+		GetWorldTimerManager().SetTimer(
+			TimerCoolDown,
+			this,
+			&ThisClass::OnAttackFinish,
+			AttackCoolTime,
+			false,
+			AttackCoolTime
+		);
 	}
+}
 
-	return false;
+void ATowerBase::TakeDamage(AActor* pTarget)
+{
+	if (HasAuthority())
+	{
+		pTarget->TakeDamage(
+			10.f,
+			FPointDamageEvent{},
+			Cast<APlayerController_TowerDefence>(GetOwner()),
+			this
+		);
+	}
 }
 
 void ATowerBase::OnFocused()
 {
-	// TODO: Render Range 
-}
-
-void ATowerBase::OnMoveTo(const FVector& vTargetPos)
-{
+	// TODO: Render Range and ui
 }

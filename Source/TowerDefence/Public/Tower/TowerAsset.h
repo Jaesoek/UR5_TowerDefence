@@ -4,6 +4,7 @@
 #include "Engine/DataAsset.h"
 #include "Types/CombatType.h"
 #include "Tower/AIController_Tower.h"
+#include "Tower/TowerAttackComponent.h"
 #include "TowerAsset.generated.h"
 
 UCLASS()
@@ -29,6 +30,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tower")
 	float AttackCoolTime;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attack Module")
+	TSubclassOf<UTowerAttackComponent>	AttackCompClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tower Mesh")
 	TSoftObjectPtr<USkeletalMesh> TowerMesh;
