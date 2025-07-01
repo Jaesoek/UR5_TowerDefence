@@ -4,6 +4,8 @@
 # Custom Ignore files
 Content/ParagonSparrow/*
 Content/ParagonGrux/*
+Content/ParagonGRIMexe/*
+Content/ParagonZinx/*
 .vscode
 
 # Compiled Object files
