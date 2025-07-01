@@ -24,18 +24,8 @@ void ACommandUnit_TowerDefence::OnFocused()
 
 void ACommandUnit_TowerDefence::OnMoveTo(const FVector& vTargetPos)
 {
-	if (false == HasAuthority())
+	if (HasAuthority())
 	{
-		GEngine->AddOnScreenDebugMessage(
-			-1, 1.f, FColor::Green, FString::Printf(TEXT("NetMode: %d"), GetNetMode())
-		);
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1, 1.f, FColor::Green, FString::Printf(TEXT("Called has authority"))
-		);
-
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), vTargetPos);
 	}
 }

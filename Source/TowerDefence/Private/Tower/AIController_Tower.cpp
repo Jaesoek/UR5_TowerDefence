@@ -11,11 +11,6 @@ void AAIController_Tower::OnPossess(APawn* InPawn)
 
 	if (m_BehaviorTree)
 	{
-		GEngine->AddOnScreenDebugMessage(
-			-1, 1.0f, FColor::Green,
-			TEXT("AI possess")
-		);
-
 		RunBehaviorTree(m_BehaviorTree);
 	}
 }
