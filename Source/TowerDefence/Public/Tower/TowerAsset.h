@@ -27,6 +27,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tower")
 	float AttackRange;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tower")
+	float AttackCoolTime;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tower Mesh")
 	TSoftObjectPtr<USkeletalMesh> TowerMesh;
 

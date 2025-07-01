@@ -8,6 +8,12 @@
 #include "Tower/TowerAsset.h"
 #include "TowerBase.generated.h"
 
+UENUM()
+enum class ETowerState : uint8
+{
+	IDLE, ATTACK, MAX
+};
+
 UCLASS()
 class TOWERDEFENCE_API ATowerBase : public APawn, public IControlUnit
 {
@@ -20,17 +26,29 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	void OnAttackFinish();
+	void SetState(ETowerState newState);
+
 	UFUNCTION()
 	void OnRep_TowerAsset();
+
+	UFUNCTION()
+	void OnRep_StateChanged();
 
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_TowerAsset)
 	TObjectPtr<UTowerAsset> TowerAsset;
 
-	UPROPERTY(Transient, Replicated)
-	bool IsAttackable;
+	UPROPERTY(Transient, Replicated, ReplicatedUsing = OnRep_StateChanged)
+	ETowerState CurState;
 
 	UPROPERTY(Transient)
 	float AttackRange;
+
+	UPROPERTY(Transient)
+	float AttackCoolTime;
+
+	UPROPERTY(Transient)
+	FTimerHandle TimerCoolDown;
 
 	UPROPERTY(Transient)
 	TObjectPtr<class UAnimMontage> MontageAttack;
@@ -51,13 +69,7 @@ public:
 		return AttackRange * AttackRange;
 	}
 
-	// TODO: Need discussion
-	//  About sync between montage and takedamage
 	virtual bool Attack(AActor* pTarget) final;
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastPlayAttackAnim(AActor* pTarget);
-	// ~Need discussion
 
 private:
 	virtual void OnFocused() override;

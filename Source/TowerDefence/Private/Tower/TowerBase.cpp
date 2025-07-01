@@ -10,8 +10,11 @@
 #include "PlayerController_TowerDefence.h"
 #include "Net/UnrealNetwork.h"
 
+#include "Utils/TDLogChannel.h"
+
+
 ATowerBase::ATowerBase()
-	: IsAttackable(true), AttackRange(0.0)
+	: CurState(ETowerState::IDLE), AttackRange(0.0), AttackCoolTime(0.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
@@ -76,27 +79,62 @@ void ATowerBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ATowerBase, TowerAsset);
-	DOREPLIFETIME(ATowerBase, IsAttackable);
+	DOREPLIFETIME(ATowerBase, CurState);
+}
+
+void ATowerBase::OnAttackFinish()
+{
+	if (HasAuthority())
+	{
+		SetState(ETowerState::IDLE);
+	}
+}
+
+void ATowerBase::SetState(ETowerState newState)
+{
+	if (HasAuthority())
+	{
+		CurState = newState;
+	}
 }
 
 void ATowerBase::OnRep_TowerAsset()
 {
 	if (IsValid(SKMesh) && IsValid(TowerAsset))	// Set mesh infoes
 	{
-		if (false == TowerAsset->TowerMesh.IsValid())
+		if (TowerAsset->TowerMesh.IsValid())
 		{
 			TowerAsset->TowerMesh.LoadSynchronous();
+			SKMesh->SetSkeletalMeshAsset(TowerAsset->TowerMesh.Get());
 		}
-		SKMesh->SetSkeletalMeshAsset(TowerAsset->TowerMesh.Get());
 		SKMesh->SetAnimInstanceClass(TowerAsset->AnimInstance);
 
-		if (false == TowerAsset->MontageAttack.IsValid())
+		if (TowerAsset->MontageAttack.IsValid())
 		{
-			TowerAsset->MontageAttack.LoadSynchronous();
+			MontageAttack = TowerAsset->MontageAttack.LoadSynchronous();
 		}
-		MontageAttack = TowerAsset->MontageAttack.Get();
 
+		AttackCoolTime = TowerAsset->AttackCoolTime;
 		AttackRange = TowerAsset->AttackRange;
+	}
+}
+
+void ATowerBase::OnRep_StateChanged()
+{
+	switch (CurState)
+	{
+	case ETowerState::ATTACK:
+		if (IsValid(MontageAttack))
+		{
+			SKMesh->GetAnimInstance()->Montage_Play(MontageAttack);
+		}
+		break;
+	default:
+		if (SKMesh->GetAnimInstance()->IsAnyMontagePlaying())
+		{
+			SKMesh->GetAnimInstance()->StopAllMontages(0.f);
+		}
+		break;
 	}
 }
 
@@ -107,28 +145,43 @@ void ATowerBase::SetupAsset(TObjectPtr<UTowerAsset> towerAsset)
 		TowerAsset = towerAsset;
 
 		AttackRange = TowerAsset->AttackRange;
+		AttackCoolTime = TowerAsset->AttackCoolTime;
 	}
 }
 
 bool ATowerBase::Attack(AActor* pTarget)
 {
 	if (false == IsValid(pTarget))
+	{
 		return false;
-
-	if (HasAuthority())	// TODO: 피드백
-	{
-		MulticastPlayAttackAnim(pTarget);
-		pTarget->TakeDamage(10.f, FPointDamageEvent{}, Cast<APlayerController_TowerDefence>(GetOwner()), this);
 	}
-	return true;
-}
-
-void ATowerBase::MulticastPlayAttackAnim_Implementation(AActor* pTarget)
-{
-	if (IsValid(pTarget) && IsValid(MontageAttack) && !SKMesh->GetAnimInstance()->Montage_IsPlaying(MontageAttack))
+	if (AttackCoolTime == 0.f)
 	{
-		SKMesh->GetAnimInstance()->Montage_Play(MontageAttack);
+		return false;
 	}
+
+	if (HasAuthority())
+	{
+		if (ETowerState::ATTACK != CurState)
+		{
+			SetState(ETowerState::ATTACK);
+			pTarget->TakeDamage(10.f, FPointDamageEvent{}, Cast<APlayerController_TowerDefence>(GetOwner()), this);
+
+			// Cool down timer
+			GetWorldTimerManager().SetTimer(
+				TimerCoolDown,
+				this,
+				&ThisClass::OnAttackFinish,
+				AttackCoolTime,
+				false,
+				AttackCoolTime
+			);
+
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void ATowerBase::OnFocused()
