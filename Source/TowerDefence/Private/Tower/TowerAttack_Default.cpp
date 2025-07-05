@@ -2,9 +2,7 @@
 
 
 #include "Tower/TowerAttack_Default.h"
-#include "Engine/DamageEvents.h"
 #include "Tower/TowerBase.h"
-#include "PlayerController_TowerDefence.h"
 
 bool UTowerAttack_Default::Attack(AActor* pTarget)
 {
