@@ -8,7 +8,6 @@
 #include "MonsterBase_TowerDefence.generated.h"
 
 class UMonsterAsset;
-class UFloatingPawnMovement;
 
 UCLASS()
 class TOWERDEFENCE_API AMonsterBase_TowerDefence : public APawn
@@ -38,16 +37,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	TObjectPtr<UFloatingPawnMovement> MovementComp;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> MontageHit;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats", ReplicatedUsing = OnRep_MonsterAsset)
 	TObjectPtr<UMonsterAsset> MonsterAsset;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats", Replicated, ReplicatedUsing = OnRep_Damaged)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats", ReplicatedUsing = OnRep_Damaged)
 	float Health;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats")
@@ -55,6 +51,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats")
 	int32 Score;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Current Status", Replicated)
+	bool IsMoving;
 
 	UPROPERTY(Transient)
 	TWeakObjectPtr<const USplineComponent> SplinePath;

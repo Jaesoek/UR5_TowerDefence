@@ -4,13 +4,12 @@
 #include "Monster/MonsterAsset.h"
 #include "GameModes/GameModeBase_TowerDefence.h"
 #include "Components/CapsuleComponent.h"
-#include "GameFramework/FloatingPawnMovement.h"
 #include "PlayerController_TowerDefence.h"
 #include "Player/PlayerState_TowerDefence.h"
 #include "Net/UnrealNetwork.h"
 
 AMonsterBase_TowerDefence::AMonsterBase_TowerDefence()
-	: Health(0.f), Speed(0.f), m_fTargetDistance(0.f), m_fCurDistance(0.f)
+	: Health(0.f), Speed(0.f), m_fTargetDistance(0.f), m_fCurDistance(0.f), IsMoving(false)
 {
 	PrimaryActorTick.bCanEverTick = true; // ���� �Ⱦ��� ��Ȱ��ȭ
 
@@ -46,9 +45,6 @@ AMonsterBase_TowerDefence::AMonsterBase_TowerDefence()
 		SkeletalMeshComponent->SetRelativeLocation(FVector{ 0.f, 0.f, -fHalfHeight });
 		SkeletalMeshComponent->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 	}
-
-	MovementComp = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
-	MovementComp->SetIsReplicated(true);
 }
 
 void AMonsterBase_TowerDefence::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -57,6 +53,7 @@ void AMonsterBase_TowerDefence::GetLifetimeReplicatedProps(TArray<FLifetimePrope
 
 	DOREPLIFETIME(AMonsterBase_TowerDefence, MonsterAsset);
 	DOREPLIFETIME(AMonsterBase_TowerDefence, Health);
+	DOREPLIFETIME(AMonsterBase_TowerDefence, IsMoving);
 }
 
 void AMonsterBase_TowerDefence::OnRep_MonsterAsset()
@@ -151,33 +148,29 @@ void AMonsterBase_TowerDefence::Tick(float DeltaSeconds)
 			m_fCurDistance += Speed * DeltaSeconds;
 			if (m_fCurDistance >= m_fTargetDistance)
 			{
+				IsMoving = false;
 				Attack();
 			}
 			else
 			{
 				const FVector&& vCurLocation = SplinePath->GetLocationAtDistanceAlongSpline(m_fCurDistance, ESplineCoordinateSpace::Type::World);
-				FVector Direction = (vCurLocation - GetActorLocation()).GetSafeNormal();
-				MovementComp->AddInputVector(Direction * Speed);
-
-				FVector Velocity = GetVelocity();
-				Velocity.Z = 0.f;
-				if (!Velocity.IsNearlyZero())
+	
+				FVector Direction = (vCurLocation - GetActorLocation()).GetSafeNormal2D();
+				FRotator CurrentRotation = GetActorRotation();
+				FRotator TargetRotation = Direction.ToOrientationRotator();
+				FRotator NewRotation;
+				const float RotationTolerance = 1.0f;
+				if (CurrentRotation.Equals(TargetRotation, RotationTolerance))
 				{
-					FRotator CurrentRotation = GetActorRotation();
-					FRotator TargetRotation = Velocity.ToOrientationRotator();
-
-					FRotator NewRotation;
-					const float RotationTolerance = 1.0f;
-					if (CurrentRotation.Equals(TargetRotation, RotationTolerance))
-					{
-						NewRotation = TargetRotation;
-					}
-					else
-					{
-						NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaSeconds, 10.f);
-					}
-					SetActorRotation(NewRotation);
+					NewRotation = TargetRotation;
 				}
+				else
+				{
+					NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaSeconds, 10.f);
+				}
+	
+				IsMoving = true;
+				SetActorLocationAndRotation(vCurLocation, NewRotation);
 			}
 		}
 	}
