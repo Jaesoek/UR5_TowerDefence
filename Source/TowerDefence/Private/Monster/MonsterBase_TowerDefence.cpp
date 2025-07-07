@@ -67,7 +67,7 @@ void AMonsterBase_TowerDefence::OnRep_MonsterAsset()
 			SkeletalMeshComponent->SetAnimInstanceClass(MonsterAsset->AnimInstance);
 		}
 
-		if (MonsterAsset->MontageHit.IsValid())
+		if (MonsterAsset->MontageHit.ToSoftObjectPath().IsValid())
 		{
 			MonsterAsset->MontageHit.LoadSynchronous();
 			MontageHit = MonsterAsset->MontageHit.Get();
@@ -77,7 +77,7 @@ void AMonsterBase_TowerDefence::OnRep_MonsterAsset()
 
 void AMonsterBase_TowerDefence::OnRep_Damaged()
 {
-	if (IsValid(MontageHit) && !SkeletalMeshComponent->GetAnimInstance()->Montage_IsPlaying(MontageHit))
+	if (IsValid(MontageHit))
 	{
 		SkeletalMeshComponent->GetAnimInstance()->Montage_Play(MontageHit);
 	}
