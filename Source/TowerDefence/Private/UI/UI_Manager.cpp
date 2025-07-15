@@ -33,6 +33,30 @@ void UUI_Manager::OpenInProgress()
 	OpenUI(UI_Asset->UI_InProgress);
 }
 
+FString UUI_Manager::OpenBuildList()
+{
+	if (!IsValid(UI_Asset) || !UI_Asset->UI_BuildList) return TEXT("");
+
+	OpenUIWith(UI_Asset->UI_BuildList);
+	return UI_Asset->UI_BuildList->GetName();
+}
+
+void UUI_Manager::DisableUI(FString KeyUI)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (nullptr == OpenWidgets.Find(KeyUI))
+		{
+			return;
+		}
+
+		if (OpenWidgets[KeyUI]->IsInViewport())
+		{
+			OpenWidgets[KeyUI]->RemoveFromViewport();
+		}
+	}
+}
+
 void UUI_Manager::OpenUI(TSubclassOf<UUserWidget> userWidget)
 {
 	if (UWorld* World = GetWorld())
@@ -47,4 +71,19 @@ void UUI_Manager::OpenUI(TSubclassOf<UUserWidget> userWidget)
 	}
 }
 
+void UUI_Manager::OpenUIWith(TSubclassOf<UUserWidget> userWidget)
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (nullptr == OpenWidgets.Find(userWidget->GetName()))
+		{
+			OpenWidgets.Emplace(
+				userWidget->GetName(), CreateWidget<UUserWidget>(World, userWidget));
+		}
 
+		if (false == OpenWidgets[userWidget->GetName()]->IsInViewport())
+		{
+			OpenWidgets[userWidget->GetName()]->AddToViewport();
+		}
+	}
+}

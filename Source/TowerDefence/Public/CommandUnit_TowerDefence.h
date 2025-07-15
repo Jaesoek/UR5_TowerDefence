@@ -14,5 +14,9 @@ public:
 	ACommandUnit_TowerDefence();
 
 	virtual void OnFocused() override;
+	virtual void OnUnFocused() override;
 	virtual void OnMoveTo(const FVector& vTargetPos) override;
+
+	UPROPERTY(Transient)
+	FString KeyUI;
 };

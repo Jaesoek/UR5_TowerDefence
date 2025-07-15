@@ -1,5 +1,7 @@
 #include "CommandUnit_TowerDefence.h"
-#include "../Public/AIControl_Player.h"
+#include "Utils/TDLogChannel.h"
+#include "AIControl_Player.h"
+#include "UI/UI_Manager.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AIController.h"
@@ -19,7 +21,19 @@ ACommandUnit_TowerDefence::ACommandUnit_TowerDefence()
 
 void ACommandUnit_TowerDefence::OnFocused()
 {
-	// TODO: Render selected ring or UI
+	// TODO: Render selected ring
+	if (UUI_Manager* pUIManager = GetGameInstance()->GetSubsystem<UUI_Manager>())
+	{
+		KeyUI = pUIManager->OpenBuildList();
+	}
+}
+
+void ACommandUnit_TowerDefence::OnUnFocused()
+{
+	if (UUI_Manager* pUIManager = GetGameInstance()->GetSubsystem<UUI_Manager>())
+	{
+		pUIManager->DisableUI(KeyUI);
+	}
 }
 
 void ACommandUnit_TowerDefence::OnMoveTo(const FVector& vTargetPos)

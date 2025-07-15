@@ -201,3 +201,8 @@ void ATowerBase::OnFocused()
 {
 	// TODO: Render Range and ui
 }
+
+void ATowerBase::OnUnFocused()
+{
+	// TODO: Disable UI
+}

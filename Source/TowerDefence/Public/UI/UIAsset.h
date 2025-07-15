@@ -20,5 +20,8 @@ public:
 	TSubclassOf<UUserWidget> UI_InProgress;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI List")
+	TSubclassOf<UUserWidget> UI_BuildList;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI List")
 	TSubclassOf<UUserWidget> UI_Result;
 };

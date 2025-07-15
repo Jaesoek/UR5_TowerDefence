@@ -18,15 +18,21 @@ public:
 
 	void OpenWait();
 	void OpenInProgress();
+	FString OpenBuildList();
+	void DisableUI(FString KeyUI);
 
 protected:
 	void OpenUI(TSubclassOf<UUserWidget> userWidget);
+	void OpenUIWith(TSubclassOf<UUserWidget> userWidget);
 
 	UPROPERTY(Transient)
 	TObjectPtr<UUIAsset> UI_Asset;
 
 	UPROPERTY(Transient)
 	TObjectPtr<UUserWidget> CurrentWidget;
+
+	UPROPERTY(Transient)
+	TMap<FString, TObjectPtr<UUserWidget>> OpenWidgets;
 
 	//UPROPERTY(Transient)
 	//TMap<FName, TObjectPtr<UUserWidget>> UI_List;

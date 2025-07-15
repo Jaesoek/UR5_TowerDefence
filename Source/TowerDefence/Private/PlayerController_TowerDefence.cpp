@@ -78,15 +78,27 @@ void APlayerController_TowerDefence::HandleSelectActor(const FInputActionValue& 
 	IControlUnit* pControlUnit = Cast<IControlUnit>(HitResult.GetActor());
 	if (nullptr != pControlUnit)
 	{
-		m_pControlUnit = HitResult.GetActor();
-		if (m_pControlUnit && m_pControlUnit.GetInterface() != nullptr)
+		if (m_pControlUnit.GetObject() != HitResult.GetActor())
 		{
-			m_pControlUnit->OnFocused();
+			if (IsValid(m_pControlUnit.GetObject()))
+			{
+				m_pControlUnit->OnUnFocused();
+			}
+
+			m_pControlUnit = HitResult.GetActor();
+			if (m_pControlUnit && m_pControlUnit.GetInterface() != nullptr)
+			{
+				m_pControlUnit->OnFocused();
+			}
 		}
-		else
+	}
+	else
+	{
+		if (IsValid(m_pControlUnit.GetObject()))
 		{
-			m_pControlUnit = nullptr;
+			m_pControlUnit->OnUnFocused();
 		}
+		m_pControlUnit = nullptr;
 	}
 }
 

@@ -84,4 +84,5 @@ public:
 
 private:
 	virtual void OnFocused() override;
+	virtual void OnUnFocused() override;
 };
