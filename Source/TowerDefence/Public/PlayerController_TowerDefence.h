@@ -18,16 +18,18 @@ class TOWERDEFENCE_API APlayerController_TowerDefence : public APlayerController
 public:
 	APlayerController_TowerDefence();
 
+	bool ReadyToSpawnTower(UTowerAsset* pTowerAsset);
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 
 	void HandleSelectActor(const FInputActionValue& Value);
 	void HandelMoveTo(const FInputActionValue& Value);
-	void HandelBuild(const FInputActionValue& Value);
+	//void HandelBuild(const FInputActionValue& Value);
 
 	UFUNCTION(Server, Reliable)
-	void Server_SpawnTower(FVector vSpawnPos);
+	void Server_SpawnTower(FVector vSpawnPos, UTowerAsset* pTowerAsset);
 
 	UFUNCTION(Server, Reliable)
 	void Server_MoveControlUnit(AActor* pControlUnit, FVector vTargetPos);

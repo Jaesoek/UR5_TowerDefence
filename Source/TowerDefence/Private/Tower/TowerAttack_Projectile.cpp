@@ -20,22 +20,22 @@ bool UTowerAttack_Projectile::Attack(AActor* pTarget)
 		{
 			SetState(ETowerState::ATTACK);
 
-			// TODO: Spawn projectile
-			//  Projectile 정보는 어디서 가져오지?
-			//  1안 : TowerAsset Detail에서 저장가능하도록 설정한다(Need to talk)
-			//  2안 : 여기서 경로 하드 코딩한다 <- 일단 이걸로 하자
-			
-			auto pProj = GetWorld()->SpawnActorDeferred<AEnergyBall_TowerProjectile>(
-				AEnergyBall_TowerProjectile::StaticClass(), pTower->GetTransform(), nullptr, pTower,
-				ESpawnActorCollisionHandlingMethod::AlwaysSpawn
-			);
-			pProj->InitInfo(
-				FProjectileInfo {
-
-				}
-			);
-
-			UGameplayStatics::FinishSpawningActor(pProj, pTower->GetTransform());
+			//auto pProj = GetWorld()->SpawnActorDeferred<AEnergyBall_TowerProjectile>(
+			//	AEnergyBall_TowerProjectile::StaticClass(), pTower->GetTransform(), nullptr, pTower,
+			//	ESpawnActorCollisionHandlingMethod::AlwaysSpawn
+			//);
+			//pProj->InitInfo(
+			//	FProjectileInfo
+			//	{
+			//		100.f,
+			//		200.f,
+			//		9.8,
+			//		10.f,
+			//		pTarget->GetActorLocation(),
+			//		vTargetPos
+			//	}
+			//);
+			//UGameplayStatics::FinishSpawningActor(pProj, pTower->GetTransform());
 
 			pTower->Attack_CoolDown();
 

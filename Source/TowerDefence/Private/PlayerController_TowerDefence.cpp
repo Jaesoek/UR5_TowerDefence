@@ -36,7 +36,7 @@ void APlayerController_TowerDefence::SetupInputComponent()
 	{
 		EnhancedInputComponent->BindAction(m_pIA_SelectActor, ETriggerEvent::Completed, this, &APlayerController_TowerDefence::HandleSelectActor);
 		EnhancedInputComponent->BindAction(m_pIA_MoveTo, ETriggerEvent::Completed, this, &APlayerController_TowerDefence::HandelMoveTo);
-		EnhancedInputComponent->BindAction(m_pIA_Build, ETriggerEvent::Completed, this, &APlayerController_TowerDefence::HandelBuild);
+		//EnhancedInputComponent->BindAction(m_pIA_Build, ETriggerEvent::Completed, this, &APlayerController_TowerDefence::HandelBuild);
 	}
 }
 
@@ -102,36 +102,61 @@ void APlayerController_TowerDefence::HandleSelectActor(const FInputActionValue& 
 	}
 }
 
-void APlayerController_TowerDefence::HandelBuild(const FInputActionValue& Value)
+//void APlayerController_TowerDefence::HandelBuild(const FInputActionValue& Value)
+//{
+//	if (false == IsLocalController())	// Key input works only in client
+//	{
+//		return;
+//	}
+//
+//	FHitResult HitResult;
+//	GetHitResultUnderCursor(ECC_Camera, false, HitResult);
+//	if (!HitResult.bBlockingHit)
+//	{
+//		return;
+//	}
+//
+//	if (auto pGrid = Cast<AGrid>(HitResult.GetActor()))
+//	{
+//		FVector vResultPos;
+//		if (pGrid->AbleToBuild(HitResult.Location, vResultPos))
+//		{
+//			Server_SpawnTower(vResultPos, );
+//		}
+//		else
+//		{
+//			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red,
+//				TEXT("Can't build in here"));
+//		}
+//	}
+//}
+
+bool APlayerController_TowerDefence::ReadyToSpawnTower(UTowerAsset* pTowerAsset)
 {
-	if (false == IsLocalController())	// Key input works only in client
+	if (IsValid(pTowerAsset))
 	{
-		return;
+		FHitResult HitResult;
+		GetHitResultUnderCursor(ECC_Camera, false, HitResult);
+		if (false == HitResult.bBlockingHit)
+		{
+			return false;
+		}
+
+		FTransform targetTrans = FTransform{ FRotator::ZeroRotator, HitResult.Location, FVector::One() };
+
+		ATowerBase* pTower = GetWorld()->SpawnActorDeferred<ATowerBase>(
+			ATowerBase::StaticClass(), targetTrans, this, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn
+		);
+		pTower->SetupAsset(pTowerAsset);
+		UGameplayStatics::FinishSpawningActor(pTower, targetTrans);
+
+		return true;
 	}
 
-	FHitResult HitResult;
-	GetHitResultUnderCursor(ECC_Camera, false, HitResult);
-	if (!HitResult.bBlockingHit)
-	{
-		return;
-	}
-
-	if (auto pGrid = Cast<AGrid>(HitResult.GetActor()))
-	{
-		FVector vResultPos;
-		if (pGrid->AbleToBuild(HitResult.Location, vResultPos))
-		{
-			Server_SpawnTower(vResultPos);
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red,
-				TEXT("Can't build in here"));
-		}
-	}
+	return false;
 }
 
-void APlayerController_TowerDefence::Server_SpawnTower_Implementation(FVector vSpawnPos)
+void APlayerController_TowerDefence::Server_SpawnTower_Implementation(FVector vSpawnPos, UTowerAsset* pTowerAsset)
 {
 	if (false == HasAuthority())
 	{
@@ -142,7 +167,7 @@ void APlayerController_TowerDefence::Server_SpawnTower_Implementation(FVector vS
 	ATowerBase* pTower = GetWorld()->SpawnActorDeferred<ATowerBase>(
 		ATowerBase::StaticClass(), targetTrans, this, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn
 	);
-	pTower->SetupAsset(ArrayTowerAssets[0]);
+	pTower->SetupAsset(pTowerAsset);
 	pTower->SetReplicates(true);
 	UGameplayStatics::FinishSpawningActor(pTower, targetTrans);
 }
